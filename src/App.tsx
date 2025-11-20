@@ -15,7 +15,7 @@ const AppContent = () => {
             // For now, WelcomeScreen handles manual entry. 
             // Ideally we pass this ID to WelcomeScreen.
         }
-    }, []);
+    }, [session]);
 
     return (
         <>

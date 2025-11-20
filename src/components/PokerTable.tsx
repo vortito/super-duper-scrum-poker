@@ -8,24 +8,6 @@ export const PokerTable: React.FC = () => {
     const { session, currentUser, revealVotes, resetSession, leaveSession } = useSession();
     const { t } = useLanguage();
 
-    if (!session) return null;
-
-    // Calculate consensus
-    const consensus = useMemo(() => {
-        if (!session.revealed) return null;
-        const votes = session.players.map(p => p.vote).filter(v => v !== null && v !== '?');
-        if (votes.length === 0) return null;
-        const firstVote = votes[0];
-        const allSame = votes.every(v => v === firstVote);
-        return allSame ? firstVote : null;
-    }, [session.revealed, session.players]);
-
-    const copyLink = () => {
-        const url = `${window.location.origin}?session=${session.id}`;
-        navigator.clipboard.writeText(url);
-        // Could add a toast here
-    };
-
     // Dynamic positioning logic
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
     const tableRef = React.useRef<HTMLDivElement>(null);
@@ -50,6 +32,40 @@ export const PokerTable: React.FC = () => {
 
         return () => observer.disconnect();
     }, []);
+
+    // Calculate consensus
+    const consensus = useMemo(() => {
+        if (!session?.revealed) return null;
+        const votes = session.players.map(p => p.vote).filter(v => v !== null && v !== '?');
+        if (votes.length === 0) return null;
+        const firstVote = votes[0];
+        const allSame = votes.every(v => v === firstVote);
+        return allSame ? firstVote : null;
+    }, [session?.revealed, session?.players]);
+
+    // Sort players to put current user at the "bottom" (first position visually in our logic?)
+    // Or just keep them stable. Let's keep stable for now to avoid jumping.
+    // Actually, for a "seated" feel, current user should be at bottom center.
+    const sortedPlayers = useMemo(() => {
+        if (!session || !currentUser) return session?.players || [];
+        const myIndex = session.players.findIndex(p => p.id === currentUser.id);
+        if (myIndex === -1) return session.players;
+
+        // Rotate array so current user is first (or last, depending on where we start rendering)
+        // Let's make current user index 0, and render index 0 at bottom (90 deg)
+        return [
+            ...session.players.slice(myIndex),
+            ...session.players.slice(0, myIndex)
+        ];
+    }, [session, currentUser]);
+
+    if (!session) return null;
+
+    const copyLink = () => {
+        const url = `${window.location.origin}?session=${session.id}`;
+        navigator.clipboard.writeText(url);
+        // Could add a toast here
+    };
 
     const getPositions = (index: number, total: number) => {
         const angleStep = (2 * Math.PI) / total;
@@ -76,22 +92,6 @@ export const PokerTable: React.FC = () => {
 
         return { cardX, cardY, playerX, playerY, rotation, scale };
     };
-
-    // Sort players to put current user at the "bottom" (first position visually in our logic?)
-    // Or just keep them stable. Let's keep stable for now to avoid jumping.
-    // Actually, for a "seated" feel, current user should be at bottom center.
-    const sortedPlayers = useMemo(() => {
-        if (!currentUser) return session.players;
-        const myIndex = session.players.findIndex(p => p.id === currentUser.id);
-        if (myIndex === -1) return session.players;
-
-        // Rotate array so current user is first (or last, depending on where we start rendering)
-        // Let's make current user index 0, and render index 0 at bottom (90 deg)
-        return [
-            ...session.players.slice(myIndex),
-            ...session.players.slice(0, myIndex)
-        ];
-    }, [session.players, currentUser]);
 
     return (
         <div className="min-h-screen bg-slate-950 text-white overflow-hidden flex flex-col relative selection:bg-indigo-500/30">
