@@ -110,8 +110,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
 
             subscribeToSession(sessionId);
             return sessionId;
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Unknown error');
             setLoading(false);
             throw err;
         }
@@ -151,8 +151,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
             localStorage.setItem('scrum_poker_user_name', playerName);
 
             subscribeToSession(sessionId);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Unknown error');
             setLoading(false);
             throw err;
         }
