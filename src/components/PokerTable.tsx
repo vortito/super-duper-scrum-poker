@@ -36,10 +36,15 @@ export const PokerTable: React.FC = () => {
     // Calculate consensus
     const consensus = useMemo(() => {
         if (!session?.revealed) return null;
-        const votes = session.players.map(p => p.vote).filter(v => v !== null && v !== '?');
-        if (votes.length === 0) return null;
-        const firstVote = votes[0];
-        const allSame = votes.every(v => v === firstVote);
+
+        const allVotes = session.players.map(p => p.vote).filter(v => v !== null);
+        if (allVotes.length === 0) return null;
+
+        const hasQuestionMark = allVotes.some(v => v === '?');
+        if (hasQuestionMark) return null;
+
+        const firstVote = allVotes[0];
+        const allSame = allVotes.every(v => v === firstVote);
         return allSame ? firstVote : null;
     }, [session?.revealed, session?.players]);
 
@@ -62,7 +67,7 @@ export const PokerTable: React.FC = () => {
     if (!session) return null;
 
     const copyLink = () => {
-        const url = `${window.location.origin}?session=${session.id}`;
+        const url = `${window.location.origin}${window.location.pathname}?session=${session.id}`;
         navigator.clipboard.writeText(url);
         // Could add a toast here
     };
