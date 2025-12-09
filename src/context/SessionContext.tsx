@@ -16,6 +16,7 @@ import { Session, Player, Vote, SessionContextType } from '../types';
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useSession = () => {
     const context = useContext(SessionContext);
     if (!context) {
@@ -70,8 +71,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
                 let createdMillis: number;
                 if (typeof sessionData.createdAt === 'number') {
                     createdMillis = sessionData.createdAt;
-                } else if ((sessionData.createdAt as any)?.toMillis) {
-                    createdMillis = (sessionData.createdAt as Timestamp).toMillis();
+                } else if (sessionData.createdAt instanceof Timestamp) {
+                    createdMillis = sessionData.createdAt.toMillis();
                 } else {
                     // Fallback for pending writes or missing timestamps
                     createdMillis = now;
