@@ -11,7 +11,7 @@ export interface Session {
     revealed: boolean;
     average: number | null;
     players: Player[];
-    createdAt: number;
+    createdAt: unknown; // Using any to support both number (legacy) and Firestore Timestamp/FieldValue
 }
 
 export interface SessionContextType {
