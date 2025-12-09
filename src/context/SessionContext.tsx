@@ -5,7 +5,10 @@ import {
     updateDoc,
     onSnapshot,
     getDoc,
-    arrayUnion
+    arrayUnion,
+    serverTimestamp,
+    Timestamp,
+    deleteDoc
 } from 'firebase/firestore';
 import { signInAnonymously } from 'firebase/auth';
 import { db, auth } from '../services/firebase';
@@ -59,6 +62,33 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
             setLoading(false);
             if (docSnap.exists()) {
                 const sessionData = docSnap.data() as Session;
+
+                // Check for expiration (24 hours)
+                const SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000;
+                const now = Date.now();
+
+                let createdMillis: number;
+                if (typeof sessionData.createdAt === 'number') {
+                    createdMillis = sessionData.createdAt;
+                } else if ((sessionData.createdAt as any)?.toMillis) {
+                    createdMillis = (sessionData.createdAt as Timestamp).toMillis();
+                } else {
+                    // Fallback for pending writes or missing timestamps
+                    createdMillis = now;
+                }
+
+                if (now - createdMillis > SESSION_EXPIRY_MS) {
+                    console.log("Session expired, deleting from Firestore...");
+                    deleteDoc(sessionRef).catch(err => console.error("Error deleting expired session:", err));
+
+                    setError('Session has expired');
+                    setSession(null);
+                    localStorage.removeItem('scrum_poker_session_id');
+                    localStorage.removeItem('scrum_poker_user_id');
+                    localStorage.removeItem('scrum_poker_user_name');
+                    return;
+                }
+
                 setSession(sessionData);
 
                 // Update current user state from the session data to keep sync
@@ -98,7 +128,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
                 revealed: false,
                 average: null,
                 players: [newPlayer],
-                createdAt: Date.now()
+                createdAt: serverTimestamp()
             };
 
             await setDoc(doc(db, 'sessions', sessionId), newSession);
