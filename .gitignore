@@ -46,3 +46,6 @@ coverage
 # Misc
 .cache
 .parcel-cache
+
+# Playwright
+test-artifacts
