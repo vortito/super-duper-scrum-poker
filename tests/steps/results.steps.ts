@@ -1,32 +1,32 @@
 import { Given, When, Then, expect } from './fixtures';
 
-When('{string} pulsa en {string}', async ({ world }, playerName: string, buttonName: string) => {
+When('{string} clicks on {string}', async ({ world }, playerName: string, buttonName: string) => {
     const page = world.getPlayer(playerName);
     await page.getByRole('button', { name: buttonName }).click();
 });
 
-Then('las cartas se revelan mostrando {string} y {string} en el tablero', async ({ world }, card1: string, card2: string) => {
+Then('the cards are revealed showing {string} and {string} on the board', async ({ world }, card1: string, card2: string) => {
     // Check on first player's page
     const page1 = Object.values(world.players)[0].page;
     await expect(page1.getByRole('main').getByText(card1, { exact: true })).toBeVisible({ timeout: 5000 });
     await expect(page1.getByRole('main').getByText(card2, { exact: true })).toBeVisible({ timeout: 5000 });
 });
 
-Then('el promedio mostrado en pantalla es {string}', async ({ world }, averageValue: string) => {
+Then('the average displayed on screen is {string}', async ({ world }, averageValue: string) => {
     for (const player of Object.values(world.players)) {
         await expect(player.page.getByText('Promedio')).toBeVisible({ timeout: 5000 });
         await expect(player.page.getByText(averageValue)).toBeVisible({ timeout: 5000 });
     }
 });
 
-Then('se muestra el mensaje de consenso {string} con el valor acordado {string}', async ({ world }, consensusTitle: string, agreedValue: string) => {
+Then('the consensus message {string} is shown with the agreed value {string}', async ({ world }, consensusTitle: string, agreedValue: string) => {
     for (const player of Object.values(world.players)) {
         await expect(player.page.getByText(consensusTitle)).toBeVisible({ timeout: 5000 });
         await expect(player.page.locator('.text-2xl', { hasText: agreedValue })).toBeVisible({ timeout: 5000 });
     }
 });
 
-Given('una sala con votos revelados entre {string} y {string}', async ({ world }, hostName: string, guestName: string) => {
+Given('a room with revealed votes between {string} and {string}', async ({ world }, hostName: string, guestName: string) => {
     // 1. Host creates room
     const hostPage = await world.createPlayer(hostName);
     await hostPage.goto('/');
@@ -55,7 +55,7 @@ Given('una sala con votos revelados entre {string} y {string}', async ({ world }
     await expect(hostPage.getByText('Promedio')).toBeVisible({ timeout: 5000 });
 });
 
-Then('las cartas del tablero se ocultan y los votos se reinician a {string}', async ({ world }, resetVoteCount: string) => {
+Then('the board cards are hidden and votes reset to {string}', async ({ world }, resetVoteCount: string) => {
     for (const player of Object.values(world.players)) {
         await expect(player.page.getByText(resetVoteCount)).toBeVisible({ timeout: 5000 });
         await expect(player.page.getByRole('button', { name: 'Revelar Cartas' })).toBeVisible({ timeout: 5000 });
