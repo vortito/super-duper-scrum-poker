@@ -92,10 +92,7 @@ export const PokerTable: React.FC = () => {
         const playerX = Math.cos(angle) * playerRx;
         const playerY = Math.sin(angle) * playerRy;
 
-        // Rotation (pointing to center)
-        const rotation = (angle * 180 / Math.PI) - 90;
-
-        return { cardX, cardY, playerX, playerY, rotation, scale };
+        return { cardX, cardY, playerX, playerY, scale };
     };
 
     return (
@@ -195,7 +192,7 @@ export const PokerTable: React.FC = () => {
                 {/* Players & Cards Orbiting */}
                 <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                     {sortedPlayers.map((player, index) => {
-                        const { cardX, cardY, playerX, playerY, rotation, scale } = getPositions(index, sortedPlayers.length);
+                        const { cardX, cardY, playerX, playerY, scale } = getPositions(index, sortedPlayers.length);
                         const isMe = currentUser?.id === player.id;
 
                         // Dynamic sizes based on scale
