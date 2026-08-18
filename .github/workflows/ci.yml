@@ -5,29 +5,64 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  # ─── Job 1: Build + Lint ──────────────────────────────────────────────────
+  build-lint:
+    name: Build & Lint
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Use Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Lint
-      run: npm run lint
+      - name: Lint
+        run: npm run lint
 
-    - name: Build
-      run: npm run build
+      - name: Build
+        run: npm run build
 
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps chromium
+  # ─── Job 2: Playwright BDD E2E Tests ─────────────────────────────────────
+  e2e:
+    name: E2E Tests (BDD)
+    runs-on: ubuntu-latest
+    # Use official Playwright image — Chromium and all system deps are pre-installed,
+    # no need to run `npx playwright install --with-deps`.
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
+      options: --user 1001
 
-    - name: Run Playwright tests
-      run: npx playwright test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Java (required by Firebase Emulator)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Generate BDD test files and run E2E tests
+        run: npm run test
+        env:
+          CI: 'true'
+          # Playwright runs inside the official container, so we target the local
+          # Chromium binary that is pre-installed in the image.
+          PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
