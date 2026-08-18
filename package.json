@@ -9,7 +9,8 @@
         "lint": "eslint .",
         "preview": "vite preview",
         "bddgen": "bddgen",
-        "test": "bddgen && playwright test"
+        "test": "bddgen && playwright test",
+        "ui": "bddgen && playwright test --ui"
     },
     "dependencies": {
         "clsx": "^2.1.1",

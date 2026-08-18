@@ -1,16 +1,16 @@
-Feature: Votación con Cartas Fibonacci
-  Como miembro del equipo
-  Quiero seleccionar y cambiar mi carta de estimación
-  Para expresar mi valoración del esfuerzo de forma síncrona
+Feature: Voting with Fibonacci Cards
+  As a team member
+  I want to select and change my estimation card
+  So I can express my effort assessment synchronously
 
-  Scenario: Votación sincronizada entre múltiples jugadores
-    Given una sala activa con "Alice" y "Bob"
-    When "Alice" vota la carta "5"
-    And "Bob" vota la carta "8"
-    Then el indicador de votos muestra "2 / 2 votos" tanto para "Alice" como para "Bob"
+  Scenario: Synchronized voting between multiple players
+    Given an active room with "Alice" and "Bob"
+    When "Alice" votes card "5"
+    And "Bob" votes card "8"
+    Then the vote indicator shows "2 / 2 votos" for both "Alice" and "Bob"
 
-  Scenario: Un jugador cambia su voto antes del revelado
-    Given una sala activa con "Alice" y "Bob"
-    When "Alice" vota la carta "3"
-    And "Alice" cambia su voto por la carta "8"
-    Then la carta seleccionada por "Alice" es la "8"
+  Scenario: A player changes their vote before reveal
+    Given an active room with "Alice" and "Bob"
+    When "Alice" votes card "3"
+    And "Alice" changes their vote to card "8"
+    Then the card selected by "Alice" is "8"
