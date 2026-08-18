@@ -1,6 +1,6 @@
 import { Given, When, Then, expect } from './fixtures';
 
-Given('una sala activa con {string} y {string}', async ({ world }, hostName: string, guestName: string) => {
+Given('an active room with {string} and {string}', async ({ world }, hostName: string, guestName: string) => {
     // 1. Host creates room
     const hostPage = await world.createPlayer(hostName);
     await hostPage.goto('/');
@@ -23,19 +23,19 @@ Given('una sala activa con {string} y {string}', async ({ world }, hostName: str
     await expect(guestPage.getByText(hostName)).toBeVisible({ timeout: 10000 });
 });
 
-When('{string} vota la carta {string}', async ({ world }, playerName: string, cardValue: string) => {
+When('{string} votes card {string}', async ({ world }, playerName: string, cardValue: string) => {
     const page = world.getPlayer(playerName);
     const cardButton = page.getByRole('button', { name: new RegExp(`^${cardValue}(\\s+${cardValue})*$`) });
     await cardButton.click();
 });
 
-When('{string} cambia su voto por la carta {string}', async ({ world }, playerName: string, cardValue: string) => {
+When('{string} changes their vote to card {string}', async ({ world }, playerName: string, cardValue: string) => {
     const page = world.getPlayer(playerName);
     const cardButton = page.getByRole('button', { name: new RegExp(`^${cardValue}(\\s+${cardValue})*$`) });
     await cardButton.click();
 });
 
-Then('el indicador de votos muestra {string} tanto para {string} como para {string}', async ({ world }, countText: string, name1: string, name2: string) => {
+Then('the vote indicator shows {string} for both {string} and {string}', async ({ world }, countText: string, name1: string, name2: string) => {
     const page1 = world.getPlayer(name1);
     const page2 = world.getPlayer(name2);
 
@@ -43,7 +43,7 @@ Then('el indicador de votos muestra {string} tanto para {string} como para {stri
     await expect(page2.getByText(countText)).toBeVisible({ timeout: 5000 });
 });
 
-Then('la carta seleccionada por {string} es la {string}', async ({ world }, playerName: string, cardValue: string) => {
+Then('the card selected by {string} is {string}', async ({ world }, playerName: string, cardValue: string) => {
     const page = world.getPlayer(playerName);
     // When a card is selected in VotingCards, it has class 'bg-white border-indigo-500'
     const selectedCard = page.getByRole('button', { name: new RegExp(`^${cardValue}(\\s+${cardValue})*$`) });

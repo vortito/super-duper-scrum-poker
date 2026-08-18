@@ -82,17 +82,21 @@ export const PokerTable: React.FC = () => {
         // cardRx was 320 (35%), playerRx was 520 (58%)
         const scale = dimensions.width > 0 ? dimensions.width / 900 : 1;
 
-        const cardRx = 280 * scale;
-        const cardRy = 130 * scale;
+        const cardRx = 370 * scale;
+        const cardRy = 150 * scale;
         const cardX = Math.cos(angle) * cardRx;
         const cardY = Math.sin(angle) * cardRy;
 
-        const playerRx = 450 * scale;
-        const playerRy = 220 * scale;
+        const playerRx = 530 * scale;
+        const playerRy = 300 * scale;
         const playerX = Math.cos(angle) * playerRx;
         const playerY = Math.sin(angle) * playerRy;
 
-        return { cardX, cardY, playerX, playerY, scale };
+        // rotationDeg: card bottom points toward center
+        // angle is measured from positive X axis; adding 90° makes the card's "foot" face the center
+        const rotationDeg = angle * (180 / Math.PI) + 90;
+
+        return { cardX, cardY, playerX, playerY, scale, rotationDeg };
     };
 
     return (
@@ -133,7 +137,7 @@ export const PokerTable: React.FC = () => {
                 {/* The Table Container - Scalable */}
                 <div
                     ref={tableRef}
-                    className="relative w-[85%] max-w-[1100px] aspect-[2/1] flex items-center justify-center z-0"
+                    className="relative w-[60%] max-w-[900px] aspect-[2/1] flex items-center justify-center z-0"
                 >
                     {/* The Table Visuals */}
                     <div className="absolute inset-0 bg-slate-800/80 rounded-[300px] border-8 border-slate-700 shadow-[0_0_50px_rgba(0,0,0,0.5)] backdrop-blur-sm transform transition-all duration-1000">
@@ -192,7 +196,7 @@ export const PokerTable: React.FC = () => {
                 {/* Players & Cards Orbiting */}
                 <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                     {sortedPlayers.map((player, index) => {
-                        const { cardX, cardY, playerX, playerY, scale } = getPositions(index, sortedPlayers.length);
+                        const { cardX, cardY, playerX, playerY, scale, rotationDeg } = getPositions(index, sortedPlayers.length);
                         const isMe = currentUser?.id === player.id;
 
                         // Dynamic sizes based on scale
@@ -208,7 +212,7 @@ export const PokerTable: React.FC = () => {
                                 <div
                                     className="absolute transition-all duration-700 ease-out flex items-center justify-center pointer-events-none"
                                     style={{
-                                        transform: `translate(${cardX}px, ${cardY}px)`,
+                                        transform: `translate(${cardX}px, ${cardY}px) rotate(${rotationDeg}deg)`,
                                         zIndex: 20,
                                         width: `${cardWidth}px`,
                                         height: `${cardHeight}px`

@@ -1,24 +1,24 @@
-Feature: Revelado de Cartas y Resultados
-  Como equipo de desarrollo
-  Quiero ver los votos revelados, el promedio o el consenso alcanzado
-  Y poder iniciar nuevas rondas de estimación
+Feature: Card Reveal and Results
+  As a development team
+  I want to see revealed votes, the average or unanimous consensus
+  And be able to start new estimation rounds
 
-  Scenario: Revelar cartas y calcular el promedio de estimaciones diferentes
-    Given una sala activa con "Alice" y "Bob"
-    And "Alice" vota la carta "5"
-    And "Bob" vota la carta "8"
-    When "Alice" pulsa en "Revelar Cartas"
-    Then las cartas se revelan mostrando "5" y "8" en el tablero
-    And el promedio mostrado en pantalla es "6.5"
+  Scenario: Reveal cards and calculate the average of different estimates
+    Given an active room with "Alice" and "Bob"
+    And "Alice" votes card "5"
+    And "Bob" votes card "8"
+    When "Alice" clicks on "Revelar Cartas"
+    Then the cards are revealed showing "5" and "8" on the board
+    And the average displayed on screen is "6.5"
 
-  Scenario: Detección automática de consenso unánime
-    Given una sala activa con "Alice" y "Bob"
-    And "Alice" vota la carta "5"
-    And "Bob" vota la carta "5"
-    When "Alice" pulsa en "Revelar Cartas"
-    Then se muestra el mensaje de consenso "¡Trato hecho!" con el valor acordado "5"
+  Scenario: Automatic detection of unanimous consensus
+    Given an active room with "Alice" and "Bob"
+    And "Alice" votes card "5"
+    And "Bob" votes card "5"
+    When "Alice" clicks on "Revelar Cartas"
+    Then the consensus message "¡Trato hecho!" is shown with the agreed value "5"
 
-  Scenario: Reiniciar la sala para una nueva ronda
-    Given una sala con votos revelados entre "Alice" y "Bob"
-    When "Alice" pulsa en "Nueva Ronda"
-    Then las cartas del tablero se ocultan y los votos se reinician a "0 / 2 votos"
+  Scenario: Reset the room for a new round
+    Given a room with revealed votes between "Alice" and "Bob"
+    When "Alice" clicks on "Nueva Ronda"
+    Then the board cards are hidden and votes reset to "0 / 2 votos"
