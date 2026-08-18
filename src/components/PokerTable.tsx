@@ -82,13 +82,13 @@ export const PokerTable: React.FC = () => {
         // cardRx was 320 (35%), playerRx was 520 (58%)
         const scale = dimensions.width > 0 ? dimensions.width / 900 : 1;
 
-        const cardRx = 320 * scale;
-        const cardRy = 150 * scale;
+        const cardRx = 280 * scale;
+        const cardRy = 130 * scale;
         const cardX = Math.cos(angle) * cardRx;
         const cardY = Math.sin(angle) * cardRy;
 
-        const playerRx = 520 * scale;
-        const playerRy = 300 * scale;
+        const playerRx = 450 * scale;
+        const playerRy = 220 * scale;
         const playerX = Math.cos(angle) * playerRx;
         const playerY = Math.sin(angle) * playerRy;
 
@@ -131,12 +131,12 @@ export const PokerTable: React.FC = () => {
             </header>
 
             {/* Main Game Area */}
-            <main className="flex-1 w-full flex items-center justify-center relative perspective-1000 overflow-hidden -mt-24">
+            <main className="flex-1 w-full flex items-center justify-center relative overflow-hidden py-16">
 
                 {/* The Table Container - Scalable */}
                 <div
                     ref={tableRef}
-                    className="relative w-[90%] max-w-[1200px] aspect-[2/1] flex items-center justify-center z-0"
+                    className="relative w-[85%] max-w-[1100px] aspect-[2/1] flex items-center justify-center z-0"
                 >
                     {/* The Table Visuals */}
                     <div className="absolute inset-0 bg-slate-800/80 rounded-[300px] border-8 border-slate-700 shadow-[0_0_50px_rgba(0,0,0,0.5)] backdrop-blur-sm transform transition-all duration-1000">
@@ -209,40 +209,33 @@ export const PokerTable: React.FC = () => {
                             <React.Fragment key={player.id}>
                                 {/* Card on Table */}
                                 <div
-                                    className="absolute transition-all duration-700 ease-out flex items-center justify-center"
+                                    className="absolute transition-all duration-700 ease-out flex items-center justify-center pointer-events-none"
                                     style={{
-                                        transform: `translate(${cardX}px, ${cardY}px) rotate(${rotation}deg)`,
+                                        transform: `translate(${cardX}px, ${cardY}px)`,
                                         zIndex: 20,
                                         width: `${cardWidth}px`,
                                         height: `${cardHeight}px`
                                     }}
                                 >
-                                    <div className="relative w-full h-full perspective-500">
+                                    <div className="relative w-full h-full">
                                         <div className={`
-                                            w-full h-full rounded-lg shadow-xl transition-all duration-500 transform-style-3d
-                                            ${session.revealed
-                                                ? 'rotate-y-180'
-                                                : player.vote !== null
-                                                    ? 'translate-y-0'
-                                                    : 'translate-y-4 opacity-0'}
+                                            w-full h-full rounded-lg shadow-xl transition-all duration-300
+                                            ${player.vote !== null ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}
                                         `}>
-                                            {/* Card Back */}
-                                            <div className={`
-                                                absolute inset-0 bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-lg border-2 border-indigo-400/30 flex items-center justify-center backface-hidden
-                                                ${!session.revealed && player.vote !== null ? 'opacity-100' : 'opacity-0'}
-                                            `}>
-                                                <div className="w-[50%] h-[60%] border-2 border-dashed border-indigo-400/30 rounded-sm" />
-                                            </div>
-
-                                            {/* Card Front */}
-                                            <div className={`
-                                                absolute inset-0 bg-white text-slate-900 rounded-lg flex items-center justify-center font-bold border-2 border-slate-200 shadow-inner rotate-y-180 backface-hidden
-                                                ${session.revealed ? 'opacity-100' : 'opacity-0'}
-                                            `}
-                                                style={{ fontSize: `${Math.max(1.25, 1.25 * scale)}rem` }}
-                                            >
-                                                {player.vote === '?' ? '🃏' : player.vote}
-                                            </div>
+                                            {!session.revealed ? (
+                                                /* Card Back */
+                                                <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-lg border-2 border-indigo-400/30 flex items-center justify-center shadow-md">
+                                                    <div className="w-[50%] h-[60%] border-2 border-dashed border-indigo-400/30 rounded-sm" />
+                                                </div>
+                                            ) : (
+                                                /* Card Front */
+                                                <div
+                                                    className="absolute inset-0 bg-white text-slate-900 rounded-lg flex items-center justify-center font-bold border-2 border-slate-200 shadow-xl"
+                                                    style={{ fontSize: `${Math.max(1.25, 1.25 * scale)}rem` }}
+                                                >
+                                                    {player.vote === '?' ? '🃏' : player.vote}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

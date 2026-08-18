@@ -16,7 +16,7 @@ async function globalSetup() {
     }
 
     try {
-        const clearPorts = spawn('fuser', ['-k', '8080/tcp', '9099/tcp']);
+        const clearPorts = spawn('fuser', ['-k', '8085/tcp', '9099/tcp', '4400/tcp', '4500/tcp', '9150/tcp']);
         await new Promise((resolve) => clearPorts.on('close', resolve));
     } catch {
         // ignore
