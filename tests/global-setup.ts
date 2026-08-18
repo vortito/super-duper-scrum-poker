@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -7,6 +7,40 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const PID_FILE = path.join(__dirname, '.emulator.pid');
+const EMULATOR_PORTS = ['8085', '9099', '4400', '4500', '9150'];
+
+/**
+ * Attempts to kill processes on the given ports using available system tools.
+ * Falls back gracefully when fuser/lsof are not installed (e.g. Playwright Docker image).
+ */
+function clearPorts(ports: string[]): void {
+    // Try fuser first (standard on most Linux distros)
+    const fuserCheck = spawnSync('which', ['fuser']);
+    if (fuserCheck.status === 0) {
+        spawnSync('fuser', ['-k', ...ports.map((p) => `${p}/tcp`)]);
+        return;
+    }
+
+    // Fall back to lsof (available on macOS and some Linux images)
+    const lsofCheck = spawnSync('which', ['lsof']);
+    if (lsofCheck.status === 0) {
+        for (const port of ports) {
+            const result = spawnSync('lsof', ['-ti', `tcp:${port}`]);
+            const pids = result.stdout.toString().trim().split('\n').filter(Boolean);
+            for (const pid of pids) {
+                try {
+                    process.kill(parseInt(pid, 10), 'SIGKILL');
+                } catch {
+                    // already dead
+                }
+            }
+        }
+        return;
+    }
+
+    // No tool available — skip silently (CI environment with fresh containers
+    // will never have stale port bindings anyway)
+}
 
 async function globalSetup() {
     console.log('Global Setup: Starting Firebase Emulators...');
@@ -15,12 +49,7 @@ async function globalSetup() {
         fs.unlinkSync(PID_FILE);
     }
 
-    try {
-        const clearPorts = spawn('fuser', ['-k', '8085/tcp', '9099/tcp', '4400/tcp', '4500/tcp', '9150/tcp']);
-        await new Promise((resolve) => clearPorts.on('close', resolve));
-    } catch {
-        // ignore
-    }
+    clearPorts(EMULATOR_PORTS);
 
     const emulator = spawn('npx', ['firebase', 'emulators:start', '--project', 'test-project'], {
         detached: true,
