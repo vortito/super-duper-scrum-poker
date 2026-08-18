@@ -5,7 +5,7 @@
             "host": "localhost"
         },
         "firestore": {
-            "port": 8080,
+            "port": 8085,
             "host": "localhost"
         },
         "ui": {

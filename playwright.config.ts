@@ -1,8 +1,13 @@
 import { defineConfig, devices } from '@playwright/test';
+import { defineBddConfig } from 'playwright-bdd';
 
+const testDir = defineBddConfig({
+    features: 'tests/features/**/*.feature',
+    steps: 'tests/steps/**/*.ts',
+});
 
 export default defineConfig({
-    testDir: 'tests',
+    testDir,
     fullyParallel: true,
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 2 : 0,
@@ -10,8 +15,8 @@ export default defineConfig({
     reporter: [['html', { outputFolder: 'test-artifacts/report', open: 'never' }]],
     outputDir: 'test-artifacts/results',
     use: {
-        trace: 'on',
-        screenshot: 'on',
+        trace: 'retain-on-failure',
+        screenshot: 'only-on-failure',
         baseURL: 'http://localhost:5174',
     },
 

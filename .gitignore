@@ -49,3 +49,4 @@ coverage
 
 # Playwright
 test-artifacts
+.features-gen
