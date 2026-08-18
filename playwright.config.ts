@@ -10,8 +10,8 @@ export default defineConfig({
     reporter: [['html', { outputFolder: 'test-artifacts/report', open: 'never' }]],
     outputDir: 'test-artifacts/results',
     use: {
-        trace: 'on',
-        screenshot: 'on',
+        trace: 'retain-on-failure',
+        screenshot: 'only-on-failure',
         baseURL: 'http://localhost:5174',
     },
 

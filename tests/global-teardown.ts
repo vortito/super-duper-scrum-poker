@@ -16,9 +16,13 @@ async function globalTeardown() {
 
         if (pid) {
             try {
-                process.kill(pid, 'SIGKILL');
-            } catch (e) {
-                console.log('Could not kill process by PID (maybe already gone)', e);
+                process.kill(-pid, 'SIGKILL');
+            } catch {
+                try {
+                    process.kill(pid, 'SIGKILL');
+                } catch {
+                    // ignore
+                }
             }
         }
 
@@ -26,7 +30,7 @@ async function globalTeardown() {
     }
 
     console.log('Global Teardown: Cleaning ports...');
-    const cleanup = spawn('fuser', ['-k', '-v', '8080/tcp', '9099/tcp']);
+    const cleanup = spawn('fuser', ['-k', '-v', '8085/tcp', '9099/tcp', '4400/tcp', '4500/tcp', '9150/tcp']);
 
     await new Promise((resolve) => {
         cleanup.on('close', resolve);
