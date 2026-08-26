@@ -50,3 +50,7 @@ coverage
 # Playwright
 test-artifacts
 .features-gen
+
+# Opencode
+.opencode
+.specify
