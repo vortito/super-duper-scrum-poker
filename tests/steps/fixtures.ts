@@ -2,9 +2,13 @@
 import { test as base, createBdd } from 'playwright-bdd';
 import { expect, Page, Browser, BrowserContext } from '@playwright/test';
 
+export const basePath = '/super-duper-scrum-poker/';
+export const roomLink = (id: string): string => `${basePath}room/${id}`;
+
 export class TestWorld {
     players: Record<string, { page: Page; context: BrowserContext }> = {};
     sessionId: string = '';
+    copiedBy: string = '';
     private contexts: BrowserContext[] = [];
 
     constructor(private browser: Browser) {}
@@ -13,7 +17,9 @@ export class TestWorld {
         if (this.players[name]) {
             return this.players[name].page;
         }
-        const context = await this.browser.newContext();
+        const context = await this.browser.newContext({
+            permissions: ['clipboard-read', 'clipboard-write'],
+        });
         this.contexts.push(context);
         const page = await context.newPage();
         this.players[name] = { page, context };
@@ -38,6 +44,7 @@ export class TestWorld {
         }
         this.players = {};
         this.contexts = [];
+        this.copiedBy = '';
     }
 }
 

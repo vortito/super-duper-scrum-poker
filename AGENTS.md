@@ -19,7 +19,7 @@
 ## Architecture & structure
 
 - Single-page React app with no client routing — `react-router-dom` is a dependency but unused; keep it that way (YAGNI).
-- `src/App.tsx` shows `WelcomeScreen` (lobby: create a session, or join via `?session=<ID>` URL param) vs `PokerTable` (game) based on `SessionContext` state.
+- `src/App.tsx` shows `WelcomeScreen` (lobby: create a session, or join via the `/room/<ID>` route) vs `PokerTable` (game) based on `SessionContext` state. The URL is kept in sync with the session via `history.replaceState` (no client routing).
 - One Firestore doc per game at `sessions/{id}` (a `players` array plus `revealed`/`average`); session IDs are 6-char client-generated strings.
 
 ```
@@ -32,7 +32,7 @@
 │   ├── services/               # firebase.ts — SDK init (db, auth)
 │   ├── i18n/                   # translations.ts — manual t() dictionary (es, en, fr)
 │   ├── types/                  # Shared types (Session, Player, Vote, context types)
-│   └── utils/                  # (empty)
+│   └── utils/                  # URL helpers (room route parse/build)
 ├── tests/                      # E2E BDD suite
 │   ├── features/*.feature      # Gherkin scenarios, one file per domain (session, voting, results, language)
 │   ├── steps/*.steps.ts        # Step definitions, one file per domain
@@ -64,6 +64,7 @@
 - All app state sync flows through `SessionContext` (`onSnapshot` on the single `sessions/{id}` doc); game actions (`createSession`, `joinSession`, `submitVote`, `revealVotes`, `resetSession`, `leaveSession`) live there too.
 - Styling with Tailwind utility classes; combine conditionally with `clsx`/`tailwind-merge`.
 - Keep it simple: no libraries, abstractions, or code paths beyond what the acceptance scenarios require.
+- No comments: code must be clean and self-explanatory (clean code philosophy) — rely on well-chosen names instead of explanations. The only allowed exception is functional lint directives (`eslint-disable`) when a rule cannot be satisfied otherwise.
 
 ### i18n
 
@@ -114,21 +115,11 @@
 - Firebase config comes from `VITE_FIREBASE_*` vars in `.env` / `.env.local` (gitignored) — copy `.env.example`. `.env.test` holds dummy values for the emulator.
 - Emulator ports (from `firebase.json`, single-project mode): auth 9099, firestore 8085.
 - CI (`.github/workflows/ci.yml`): build+lint job on Node 20; e2e job runs inside the official Playwright container with Java 17 and `firebase-tools` installed, `npm run test` with `CI=true` (serial workers, 2 retries).
-- Deploy (`.github/workflows/deploy.yml`): push to `main` builds and deploys `dist/` to GitHub Pages; Firebase config is injected from repo secrets.
+- Deploy (`.github/workflows/deploy.yml`): push to `main` builds and deploys `dist/` to GitHub Pages; Firebase config is injected from repo secrets. The build also emits `dist/404.html` (a copy of `index.html`) so GitHub Pages serves the SPA for `/room/<ID>` deep links.
 
 ## Task workflow
 
-The project follows the constitution at `.specify/memory/constitution.md` (v1.0.0), whose five principles govern all work: ATDD (NON-NEGOTIABLE), multiplayer correctness, deterministic/isolated test environments, simplicity & YAGNI, and quality gates. On conflict between any document and the constitution, the constitution wins, and this file must be kept consistent with it.
-
-Spec-driven development uses Spec Kit (`.specify/`) with the `speckit.*` commands in `.opencode/commands/`:
-
-- `speckit.specify` → write the feature spec (lands in `specs/`); optionally `speckit.clarify` to resolve ambiguities.
-- `speckit.plan` → technical implementation plan.
-- `speckit.tasks` → task breakdown (optionally `speckit.taskstoissues`).
-- `speckit.implement` → execute the tasks.
-- Support commands: `speckit.analyze`, `speckit.checklist`, `speckit.constitution`, `speckit.converge`.
-
-Standard loop for every change (whether or not Spec Kit is used):
+Standard loop for every change:
 
 1. Write or extend the acceptance scenario (`tests/features/`) and its step definitions (`tests/steps/`).
 2. Run the suite: `npm run test` (regenerates specs via `bddgen`); single scenario: `npm run test -- -g "scenario title"`; interactive: `npm run ui`.

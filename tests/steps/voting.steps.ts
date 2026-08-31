@@ -1,4 +1,4 @@
-import { Given, When, Then, expect } from './fixtures';
+import { Given, When, Then, expect, roomLink } from './fixtures';
 
 Given('an active room with {string} and {string}', async ({ world }, hostName: string, guestName: string) => {
     // 1. Host creates room
@@ -14,7 +14,7 @@ Given('an active room with {string} and {string}', async ({ world }, hostName: s
 
     // 2. Guest joins room
     const guestPage = await world.createPlayer(guestName);
-    await guestPage.goto(`/?session=${world.sessionId}`);
+    await guestPage.goto(roomLink(world.sessionId));
     await guestPage.getByPlaceholder('Ej. Ana, Juan...').fill(guestName);
     await guestPage.getByRole('button', { name: 'Entrar a la Sala' }).click();
 

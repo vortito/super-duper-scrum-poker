@@ -13,6 +13,7 @@ import {
 import { signInAnonymously } from 'firebase/auth';
 import { db, auth } from '../services/firebase';
 import { Session, Player, Vote, SessionContextType } from '../types';
+import { useLanguage } from './LanguageContext';
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
@@ -34,6 +35,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     const [currentUser, setCurrentUser] = useState<Player | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const { t } = useLanguage();
 
     // Persist user session locally
     useEffect(() => {
@@ -82,7 +84,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
                     console.log("Session expired, deleting from Firestore...");
                     deleteDoc(sessionRef).catch(err => console.error("Error deleting expired session:", err));
 
-                    setError('Session has expired');
+                    setError(t('errors.sessionExpired'));
                     setSession(null);
                     localStorage.removeItem('scrum_poker_session_id');
                     localStorage.removeItem('scrum_poker_user_id');
@@ -100,7 +102,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
                     }
                 }
             } else {
-                setError('Session not found');
+                setError(t('errors.sessionNotFound'));
                 setSession(null);
                 localStorage.removeItem('scrum_poker_session_id');
             }
@@ -159,7 +161,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
             const sessionSnap = await getDoc(sessionRef);
 
             if (!sessionSnap.exists()) {
-                throw new Error('Session not found');
+                throw new Error(t('errors.sessionNotFound'));
             }
 
             const sessionData = sessionSnap.data() as Session;
@@ -186,6 +188,18 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
             setError(err instanceof Error ? err.message : 'Unknown error');
             setLoading(false);
             throw err;
+        }
+    };
+
+    const checkSessionExists = async (sessionId: string): Promise<void> => {
+        try {
+            await signInAnonymously(auth);
+            const sessionSnap = await getDoc(doc(db, 'sessions', sessionId));
+            if (!sessionSnap.exists()) {
+                setError(t('errors.sessionNotFound'));
+            }
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Unknown error');
         }
     };
 
@@ -250,6 +264,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
             error,
             createSession,
             joinSession,
+            checkSessionExists,
             submitVote,
             revealVotes,
             resetSession,
