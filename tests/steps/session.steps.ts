@@ -1,4 +1,4 @@
-import { Given, When, Then, expect } from './fixtures';
+import { Given, When, Then, expect, roomLink } from './fixtures';
 
 Given('a user visits the home screen', async ({ page }) => {
     await page.goto('/');
@@ -19,6 +19,7 @@ When('they create a room with the name {string}', async ({ page, world }, name: 
 Then('they see the room board with a unique identifier', async ({ page, world }) => {
     expect(world.sessionId.length).toBeGreaterThan(0);
     await expect(page.getByText(new RegExp(`Sala:\\s*${world.sessionId}`, 'i'))).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`room/${world.sessionId}$`));
 });
 
 Then('{string} appears in the participant list', async ({ page }, name: string) => {
@@ -39,7 +40,7 @@ Given('{string} has created an estimation room', async ({ world }, hostName: str
 
 When('{string} accesses the room via the invitation link', async ({ world }, playerName: string) => {
     const page = await world.createPlayer(playerName);
-    await page.goto(`/?session=${world.sessionId}`);
+    await page.goto(roomLink(world.sessionId));
     const sessionInput = page.getByPlaceholder('Ej. X7Y2Z9');
     await expect(sessionInput).toBeVisible();
     await expect(sessionInput).toHaveValue(world.sessionId);
@@ -72,4 +73,30 @@ Then('the start session button is disabled when the name is empty', async ({ pag
     await nameInput.fill('');
     const startButton = page.getByRole('button', { name: 'Comenzar Sesión' });
     await expect(startButton).toBeDisabled();
+});
+
+When('they open the invitation link for the room {string}', async ({ page }, roomId: string) => {
+    await page.goto(roomLink(roomId));
+});
+
+Then('they see the room code {string} pre-filled in the join form', async ({ page }, roomId: string) => {
+    const sessionInput = page.getByPlaceholder('Ej. X7Y2Z9');
+    await expect(sessionInput).toBeVisible();
+    await expect(sessionInput).toHaveValue(roomId);
+});
+
+Then('they see an error message that the room does not exist', async ({ page }) => {
+    await expect(page.getByText('La sala no existe')).toBeVisible({ timeout: 15000 });
+});
+
+When('{string} clicks the copy link button', async ({ world }, playerName: string) => {
+    const page = world.getPlayer(playerName);
+    world.copiedBy = playerName;
+    await page.getByTitle('Copiar enlace').click();
+});
+
+Then('the clipboard contains the current room URL', async ({ world }) => {
+    const page = world.getPlayer(world.copiedBy);
+    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+    expect(clipboardText).toBe(page.url());
 });

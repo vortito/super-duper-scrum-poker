@@ -1,19 +1,22 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { SessionProvider, useSession } from './context/SessionContext';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { PokerTable } from './components/PokerTable';
+import { LanguageProvider } from './context/LanguageContext';
+import { LanguageSelector } from './components/LanguageSelector';
+import { homeUrl, roomUrl } from './utils/url';
 
 const AppContent = () => {
     const { session } = useSession();
+    const hadSession = useRef(false);
 
     useEffect(() => {
-        // Check for URL param to auto-join
-        const params = new URLSearchParams(window.location.search);
-        const sessionIdParam = params.get('session');
-        if (sessionIdParam && !session) {
-            // We can't auto-join without a name, but we can pre-fill the ID in WelcomeScreen
-            // For now, WelcomeScreen handles manual entry. 
-            // Ideally we pass this ID to WelcomeScreen.
+        if (session) {
+            hadSession.current = true;
+            window.history.replaceState(null, '', roomUrl(session.id));
+        } else if (hadSession.current) {
+            hadSession.current = false;
+            window.history.replaceState(null, '', homeUrl());
         }
     }, [session]);
 
@@ -23,9 +26,6 @@ const AppContent = () => {
         </>
     );
 };
-
-import { LanguageProvider } from './context/LanguageContext';
-import { LanguageSelector } from './components/LanguageSelector';
 
 function App() {
     return (

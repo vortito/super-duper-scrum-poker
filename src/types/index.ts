@@ -21,6 +21,7 @@ export interface SessionContextType {
     error: string | null;
     createSession: (playerName: string) => Promise<string>;
     joinSession: (sessionId: string, playerName: string) => Promise<void>;
+    checkSessionExists: (sessionId: string) => Promise<void>;
     submitVote: (vote: Vote) => Promise<void>;
     revealVotes: () => Promise<void>;
     resetSession: () => Promise<void>;

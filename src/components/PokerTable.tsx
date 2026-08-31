@@ -67,9 +67,7 @@ export const PokerTable: React.FC = () => {
     if (!session) return null;
 
     const copyLink = () => {
-        const url = `${window.location.origin}${window.location.pathname}?session=${session.id}`;
-        navigator.clipboard.writeText(url);
-        // Could add a toast here
+        navigator.clipboard.writeText(window.location.href);
     };
 
     const getPositions = (index: number, total: number) => {
