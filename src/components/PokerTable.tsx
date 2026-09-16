@@ -98,20 +98,20 @@ export const PokerTable: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 text-white overflow-hidden flex flex-col relative selection:bg-indigo-500/30">
+        <div className="min-h-screen bg-ink-950 text-white overflow-hidden flex flex-col relative selection:bg-accent/30">
 
             {/* Ambient Background */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-slate-950 pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-accent-deep/20 via-ink-950 to-ink-950 pointer-events-none" />
 
             {/* Header */}
             <header className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-40 pointer-events-none">
-                <div className="pointer-events-auto flex items-center gap-4 bg-slate-900/50 backdrop-blur-md p-2 pr-4 rounded-full border border-white/5">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-lg shadow-lg">
+                <div className="pointer-events-auto flex items-center gap-4 bg-ink-900/50 backdrop-blur-md p-2 pr-4 rounded-full border border-white/5">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-accent-secondary flex items-center justify-center font-bold text-lg shadow-lg">
                         SP
                     </div>
                     <div>
-                        <h1 className="text-sm font-bold text-slate-200">{t('welcome.title')}</h1>
-                        <div className="flex items-center gap-2 text-xs text-slate-400">
+                        <h1 className="text-sm font-bold text-ink-200">{t('welcome.title')}</h1>
+                        <div className="flex items-center gap-2 text-xs text-ink-400">
                             <span>{t('game.room')}: {session.id}</span>
                             <button onClick={copyLink} className="hover:text-white transition-colors" title={t('game.copy')}>
                                 <Copy size={12} />
@@ -122,7 +122,7 @@ export const PokerTable: React.FC = () => {
 
                 <button
                     onClick={leaveSession}
-                    className="pointer-events-auto absolute top-20 right-6 flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-all border border-red-500/20 text-sm font-medium backdrop-blur-md"
+                    className="pointer-events-auto absolute top-20 right-6 flex items-center gap-2 px-4 py-2 rounded-full bg-danger/10 hover:bg-danger/20 text-danger hover:brightness-110 transition-all border border-danger/20 text-sm font-medium backdrop-blur-md"
                 >
                     <LogOut size={16} />
                     <span>{t('game.exit')}</span>
@@ -138,8 +138,8 @@ export const PokerTable: React.FC = () => {
                     className="relative w-[60%] max-w-[900px] aspect-[2/1] flex items-center justify-center z-0"
                 >
                     {/* The Table Visuals */}
-                    <div className="absolute inset-0 bg-slate-800/80 rounded-[300px] border-8 border-slate-700 shadow-[0_0_50px_rgba(0,0,0,0.5)] backdrop-blur-sm transform transition-all duration-1000">
-                        <div className="absolute inset-2 rounded-[290px] bg-slate-800 border border-white/5 shadow-inner" />
+                    <div className="absolute inset-0 bg-ink-800/80 rounded-[300px] border-8 border-ink-700 shadow-[0_0_50px_rgba(0,0,0,0.5)] backdrop-blur-sm transform transition-all duration-1000">
+                        <div className="absolute inset-2 rounded-[290px] bg-ink-800 border border-white/5 shadow-inner" />
                     </div>
 
                     {/* Center Content */}
@@ -149,16 +149,16 @@ export const PokerTable: React.FC = () => {
                                 {consensus !== null ? (
                                     <div className="flex flex-col items-center gap-2">
                                         <div className="text-5xl mb-2">🎉</div>
-                                        <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600">
+                                        <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-success to-success-deep">
                                             {t('game.deal')}
                                         </h2>
-                                        <div className="text-xl text-slate-400 font-medium">
+                                        <div className="text-xl text-ink-400 font-medium">
                                             {t('game.agreed')} <span className="text-white font-bold text-2xl">{consensus}</span>
                                         </div>
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center">
-                                        <span className="text-slate-500 text-xs uppercase tracking-widest mb-1">{t('game.average')}</span>
+                                        <span className="text-ink-500 text-xs uppercase tracking-widest mb-1">{t('game.average')}</span>
                                         <span className="text-6xl font-bold text-white drop-shadow-lg">
                                             {session.average}
                                         </span>
@@ -167,7 +167,7 @@ export const PokerTable: React.FC = () => {
 
                                 <button
                                     onClick={() => resetSession()}
-                                    className="mt-8 flex items-center gap-2 px-6 py-3 bg-slate-700 hover:bg-slate-600 rounded-full text-white font-medium transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 mx-auto"
+                                    className="mt-8 flex items-center gap-2 px-6 py-3 bg-ink-700 hover:bg-ink-600 rounded-full text-white font-medium transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 mx-auto"
                                 >
                                     <RotateCcw size={18} />
                                     {t('game.newRound')}
@@ -175,12 +175,12 @@ export const PokerTable: React.FC = () => {
                             </div>
                         ) : (
                             <div className="flex flex-col items-center gap-4">
-                                <div className="text-slate-500 font-medium tracking-wide">
+                                <div className="text-ink-500 font-medium tracking-wide">
                                     {session.players.filter(p => p.vote !== null).length} / {session.players.length} {t('game.votes')}
                                 </div>
                                 <button
                                     onClick={() => revealVotes()}
-                                    className="group relative px-8 py-4 bg-indigo-600 hover:bg-indigo-500 rounded-full text-white font-bold shadow-lg shadow-indigo-500/25 transition-all hover:scale-105 active:scale-95"
+                                    className="group relative px-8 py-4 bg-accent hover:brightness-110 rounded-full text-white font-bold shadow-lg shadow-accent/25 transition-all hover:scale-105 active:scale-95"
                                 >
                                     <span className="flex items-center gap-2">
                                         <Eye size={20} /> {t('game.reveal')}
@@ -223,13 +223,13 @@ export const PokerTable: React.FC = () => {
                                         `}>
                                             {!session.revealed ? (
                                                 /* Card Back */
-                                                <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-lg border-2 border-indigo-400/30 flex items-center justify-center shadow-md">
-                                                    <div className="w-[50%] h-[60%] border-2 border-dashed border-indigo-400/30 rounded-sm" />
+                                                <div className="absolute inset-0 bg-gradient-to-br from-accent to-accent-deep rounded-lg border-2 border-accent/30 flex items-center justify-center shadow-md">
+                                                    <div className="w-[50%] h-[60%] border-2 border-dashed border-accent/30 rounded-sm" />
                                                 </div>
                                             ) : (
                                                 /* Card Front */
                                                 <div
-                                                    className="absolute inset-0 bg-white text-slate-900 rounded-lg flex items-center justify-center font-bold border-2 border-slate-200 shadow-xl"
+                                                    className="absolute inset-0 bg-white text-ink-900 rounded-lg flex items-center justify-center font-bold border-2 border-ink-200 shadow-xl"
                                                     style={{ fontSize: `${Math.max(1.25, 1.25 * scale)}rem` }}
                                                 >
                                                     {player.vote === '?' ? '🃏' : player.vote}
@@ -256,8 +256,8 @@ export const PokerTable: React.FC = () => {
                                             className={`
                                                 rounded-full flex items-center justify-center font-bold border-2 shadow-lg z-20 relative
                                                 ${isMe
-                                                    ? 'bg-indigo-500 border-indigo-300 text-white'
-                                                    : 'bg-slate-700 border-slate-600 text-slate-300'}
+                                                    ? 'bg-accent border-accent-soft text-white'
+                                                    : 'bg-ink-700 border-ink-600 text-ink-300'}
                                             `}
                                             style={{
                                                 width: `${avatarSize}px`,
@@ -269,8 +269,8 @@ export const PokerTable: React.FC = () => {
                                         </div>
                                         <span
                                             className={`
-                                                font-medium px-2 py-0.5 rounded-full bg-slate-900/80 backdrop-blur border border-white/10 whitespace-nowrap
-                                                ${isMe ? 'text-indigo-300' : 'text-slate-400'}
+                                                font-medium px-2 py-0.5 rounded-full bg-ink-900/80 backdrop-blur border border-white/10 whitespace-nowrap
+                                                ${isMe ? 'text-accent-soft' : 'text-ink-400'}
                                             `}
                                             style={{ fontSize: `${Math.max(0.75, 0.75 * scale * 1.2)}rem` }}
                                         >

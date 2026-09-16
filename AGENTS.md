@@ -136,8 +136,6 @@ Notes:
 ## Documentation
 
 - `README.md` — product description (currently minimal; keep updated as the app grows).
-- `.specify/memory/constitution.md` — project constitution: principles, constraints, workflow, governance. Supersedes all other docs on conflict.
-- `specs/` — Spec Kit feature specs, one folder per feature.
 - `.env.example` — required `VITE_FIREBASE_*` environment variables.
 - `firestore.rules` — Firestore security rules.
 - `test-artifacts/` — generated Playwright HTML report and results (not committed).

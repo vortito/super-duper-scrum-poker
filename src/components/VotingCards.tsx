@@ -25,7 +25,7 @@ export const VotingCards: React.FC = () => {
             onMouseLeave={() => setIsHovering(false)}
         >
             {/* Gradient fade for the bottom area */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/80 to-transparent pointer-events-none" />
 
             <div className={`
         relative flex items-end justify-center transition-all duration-500 px-4 pb-8
@@ -55,10 +55,10 @@ export const VotingCards: React.FC = () => {
                             }}
                             className={`
                 relative w-24 h-40 rounded-xl border-2 shadow-2xl transition-all duration-500 ease-out origin-bottom
-                flex items-center justify-center text-4xl font-bold group bg-slate-800
+                flex items-center justify-center text-4xl font-bold group bg-ink-800
                 ${isSelected
-                                    ? 'bg-white border-indigo-500 text-indigo-600 scale-110'
-                                    : 'border-slate-600 text-slate-300 hover:bg-slate-700 hover:-translate-y-10 hover:scale-110 hover:z-40 hover:border-slate-400'}
+                                    ? 'bg-white border-accent text-accent scale-110'
+                                    : 'border-ink-600 text-ink-300 hover:bg-ink-700 hover:-translate-y-10 hover:scale-110 hover:z-40 hover:border-ink-400'}
               `}
                         >
                             {/* Card Pattern */}
