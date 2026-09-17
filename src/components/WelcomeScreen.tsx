@@ -1,22 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSession } from '../context/SessionContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Users, Play } from 'lucide-react';
+import { getRoomIdFromPath } from '../utils/url';
 
 export const WelcomeScreen: React.FC = () => {
-    const { createSession, joinSession, loading, error } = useSession();
+    const { createSession, joinSession, checkSessionExists, loading, error } = useSession();
     const { t } = useLanguage();
     const [name, setName] = useState(() => {
         return localStorage.getItem('scrum_poker_username') || '';
     });
-    const [sessionId, setSessionId] = useState(() => {
-        const params = new URLSearchParams(window.location.search);
-        return params.get('session') || '';
-    });
-    const [mode, setMode] = useState<'create' | 'join'>(() => {
-        const params = new URLSearchParams(window.location.search);
-        return params.get('session') ? 'join' : 'create';
-    });
+    const [sessionId, setSessionId] = useState(() => getRoomIdFromPath() || '');
+    const [mode, setMode] = useState<'create' | 'join'>(() =>
+        (getRoomIdFromPath() ? 'join' : 'create')
+    );
+
+    useEffect(() => {
+        const roomFromPath = getRoomIdFromPath();
+        if (roomFromPath) {
+            checkSessionExists(roomFromPath);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

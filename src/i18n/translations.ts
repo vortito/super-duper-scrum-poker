@@ -26,6 +26,10 @@ export const translations = {
             reveal: "Revelar Cartas",
             newRound: "Nueva Ronda",
             copy: "Copiar enlace"
+        },
+        errors: {
+            sessionNotFound: "La sala no existe",
+            sessionExpired: "La sala ha expirado"
         }
     },
     en: {
@@ -53,6 +57,10 @@ export const translations = {
             reveal: "Reveal Cards",
             newRound: "New Round",
             copy: "Copy Link"
+        },
+        errors: {
+            sessionNotFound: "Room not found",
+            sessionExpired: "Room has expired"
         }
     },
     fr: {
@@ -80,6 +88,10 @@ export const translations = {
             reveal: "Révéler les Cartes",
             newRound: "Nouvelle Manche",
             copy: "Copier le lien"
+        },
+        errors: {
+            sessionNotFound: "La salle n'existe pas",
+            sessionExpired: "La salle a expiré"
         }
     }
 };

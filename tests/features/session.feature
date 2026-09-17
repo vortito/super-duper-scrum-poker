@@ -19,3 +19,14 @@ Feature: Room and Participant Management
   Scenario: Required field validation on the form
     Given a user visits the home screen
     Then the start session button is disabled when the name is empty
+
+  Scenario: Opening a link to a room that does not exist
+    Given a user visits the home screen
+    When they open the invitation link for the room "ZZZZZZ"
+    Then they see the room code "ZZZZZZ" pre-filled in the join form
+    And they see an error message that the room does not exist
+
+  Scenario: Copying the room link copies the current room URL
+    Given "Alice" has created an estimation room
+    When "Alice" clicks the copy link button
+    Then the clipboard contains the current room URL
