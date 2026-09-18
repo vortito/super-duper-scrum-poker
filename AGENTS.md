@@ -66,7 +66,7 @@ Implementation of a spec follows this ATDD lifecycle, from branch to merge:
 3. **Implement** — build the feature, iterating until all quality gates pass. Minor in-path refactoring is allowed; larger refactors are separate tasks.
 4. **Validation** *(checkpoint)* — present the implementation to the user. If changes are needed: return to step 2 (if the features need redefinition) or step 3 (if only implementation changes). If approved: continue.
 5. **Commit & push** — make logical commits with Conventional Commit messages. **Each commit must be a functional state of the application with all quality gates green.** Push to the branch.
-6. **Pull request** — open the PR to `main` (`gh pr create`). Wait for the CI pipeline.
+6. **Pull request** — open the PR to `main` (`gh pr create`), then enable automerge (`gh pr merge <number> --auto`). Wait for the CI pipeline.
 7. **Pipeline** — if the pipeline **fails**: inform the user of the problem and a proposed fix, then wait for direction. If the pipeline **passes**: the PR merges automatically (rebase/ff) and the implementation phase is complete.
 
 **Quality gates** — a feature is "passing" only when all of the following are green:
