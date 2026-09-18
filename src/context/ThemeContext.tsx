@@ -9,7 +9,6 @@ type ThemeVars = {
     secondary: string;
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const THEMES: Record<ThemeName, ThemeVars> = {
     blue: { accent: '#6366f1', soft: '#818cf8', deep: '#3730a3', secondary: '#a855f7' },
     green: { accent: '#10b981', soft: '#34d399', deep: '#065f46', secondary: '#14b8a6' },
@@ -18,7 +17,6 @@ export const THEMES: Record<ThemeName, ThemeVars> = {
     cyan: { accent: '#06b6d4', soft: '#22d3ee', deep: '#155e75', secondary: '#0ea5e9' },
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const THEME_ORDER: ThemeName[] = ['blue', 'green', 'pink', 'orange', 'cyan'];
 
 const THEME_STORAGE_KEY = 'scrum_poker_theme';
@@ -64,7 +62,6 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     );
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useTheme = () => {
     const context = useContext(ThemeContext);
     if (context === undefined) {

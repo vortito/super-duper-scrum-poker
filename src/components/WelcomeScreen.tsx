@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useSession } from '../context/SessionContext';
+import React, { useEffect, useRef, useState } from 'react';
+import { useSession, USER_NAME_KEY } from '../context/SessionContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Users, Play } from 'lucide-react';
 import { getRoomIdFromPath } from '../utils/url';
@@ -7,35 +7,33 @@ import { getRoomIdFromPath } from '../utils/url';
 export const WelcomeScreen: React.FC = () => {
     const { createSession, joinSession, checkSessionExists, loading, error } = useSession();
     const { t } = useLanguage();
-    const [name, setName] = useState(() => {
-        return localStorage.getItem('scrum_poker_username') || '';
-    });
+    const [name, setName] = useState(() => localStorage.getItem(USER_NAME_KEY) || '');
     const [sessionId, setSessionId] = useState(() => getRoomIdFromPath() || '');
-    const [mode, setMode] = useState<'create' | 'join'>(() =>
-        (getRoomIdFromPath() ? 'join' : 'create')
-    );
+    const [mode, setMode] = useState<'create' | 'join'>(() => (getRoomIdFromPath() ? 'join' : 'create'));
+
+    const checkSessionExistsRef = useRef(checkSessionExists);
+    checkSessionExistsRef.current = checkSessionExists;
 
     useEffect(() => {
         const roomFromPath = getRoomIdFromPath();
         if (roomFromPath) {
-            checkSessionExists(roomFromPath);
+            checkSessionExistsRef.current(roomFromPath);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!name.trim()) return;
+        const trimmedName = name.trim();
+        if (!trimmedName) return;
 
-        // Persist username
-        localStorage.setItem('scrum_poker_username', name.trim());
+        localStorage.setItem(USER_NAME_KEY, trimmedName);
 
         try {
             if (mode === 'create') {
-                await createSession(name);
+                await createSession(trimmedName);
             } else {
                 if (!sessionId.trim()) return;
-                await joinSession(sessionId, name);
+                await joinSession(sessionId, trimmedName);
             }
         } catch (err) {
             console.error(err);

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { useSession } from '../context/SessionContext';
 import { useLanguage } from '../context/LanguageContext';
 import { VotingCards } from './VotingCards';
@@ -8,11 +8,10 @@ export const PokerTable: React.FC = () => {
     const { session, currentUser, revealVotes, resetSession, leaveSession } = useSession();
     const { t } = useLanguage();
 
-    // Dynamic positioning logic
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-    const tableRef = React.useRef<HTMLDivElement>(null);
+    const tableRef = useRef<HTMLDivElement>(null);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const updateDimensions = () => {
             if (tableRef.current) {
                 setDimensions({
@@ -22,7 +21,6 @@ export const PokerTable: React.FC = () => {
             }
         };
 
-        // Initial measure
         updateDimensions();
 
         const observer = new ResizeObserver(updateDimensions);
@@ -33,31 +31,23 @@ export const PokerTable: React.FC = () => {
         return () => observer.disconnect();
     }, []);
 
-    // Calculate consensus
     const consensus = useMemo(() => {
         if (!session?.revealed) return null;
 
-        const allVotes = session.players.map(p => p.vote).filter(v => v !== null);
+        const allVotes = session.players.map((p) => p.vote).filter((v) => v !== null);
         if (allVotes.length === 0) return null;
 
-        const hasQuestionMark = allVotes.some(v => v === '?');
-        if (hasQuestionMark) return null;
+        if (allVotes.some((v) => v === '?')) return null;
 
         const firstVote = allVotes[0];
-        const allSame = allVotes.every(v => v === firstVote);
-        return allSame ? firstVote : null;
+        return allVotes.every((v) => v === firstVote) ? firstVote : null;
     }, [session?.revealed, session?.players]);
 
-    // Sort players to put current user at the "bottom" (first position visually in our logic?)
-    // Or just keep them stable. Let's keep stable for now to avoid jumping.
-    // Actually, for a "seated" feel, current user should be at bottom center.
     const sortedPlayers = useMemo(() => {
         if (!session || !currentUser) return session?.players || [];
-        const myIndex = session.players.findIndex(p => p.id === currentUser.id);
+        const myIndex = session.players.findIndex((p) => p.id === currentUser.id);
         if (myIndex === -1) return session.players;
 
-        // Rotate array so current user is first (or last, depending on where we start rendering)
-        // Let's make current user index 0, and render index 0 at bottom (90 deg)
         return [
             ...session.players.slice(myIndex),
             ...session.players.slice(0, myIndex)
@@ -72,12 +62,7 @@ export const PokerTable: React.FC = () => {
 
     const getPositions = (index: number, total: number) => {
         const angleStep = (2 * Math.PI) / total;
-        const angleOffset = Math.PI / 2;
-        const angle = index * angleStep + angleOffset;
-
-        // Dynamic radii based on table width
-        // Base width reference is ~900px
-        // cardRx was 320 (35%), playerRx was 520 (58%)
+        const angle = index * angleStep + Math.PI / 2;
         const scale = dimensions.width > 0 ? dimensions.width / 900 : 1;
 
         const cardRx = 370 * scale;
@@ -90,8 +75,6 @@ export const PokerTable: React.FC = () => {
         const playerX = Math.cos(angle) * playerRx;
         const playerY = Math.sin(angle) * playerRy;
 
-        // rotationDeg: card bottom points toward center
-        // angle is measured from positive X axis; adding 90° makes the card's "foot" face the center
         const rotationDeg = angle * (180 / Math.PI) + 90;
 
         return { cardX, cardY, playerX, playerY, scale, rotationDeg };
@@ -99,11 +82,8 @@ export const PokerTable: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-ink-950 text-white overflow-hidden flex flex-col relative selection:bg-accent/30">
-
-            {/* Ambient Background */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-accent-deep/20 via-ink-950 to-ink-950 pointer-events-none" />
 
-            {/* Header */}
             <header className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-40 pointer-events-none">
                 <div className="pointer-events-auto flex items-center gap-4 bg-ink-900/50 backdrop-blur-md p-2 pr-4 rounded-full border border-white/5">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-accent-secondary flex items-center justify-center font-bold text-lg shadow-lg">
@@ -129,20 +109,15 @@ export const PokerTable: React.FC = () => {
                 </button>
             </header>
 
-            {/* Main Game Area */}
             <main className="flex-1 w-full flex items-center justify-center relative overflow-hidden py-16">
-
-                {/* The Table Container - Scalable */}
                 <div
                     ref={tableRef}
                     className="relative w-[60%] max-w-[900px] aspect-[2/1] flex items-center justify-center z-0"
                 >
-                    {/* The Table Visuals */}
                     <div className="absolute inset-0 bg-ink-800/80 rounded-[300px] border-8 border-ink-700 shadow-[0_0_50px_rgba(0,0,0,0.5)] backdrop-blur-sm transform transition-all duration-1000">
                         <div className="absolute inset-2 rounded-[290px] bg-ink-800 border border-white/5 shadow-inner" />
                     </div>
 
-                    {/* Center Content */}
                     <div className="z-10 text-center relative">
                         {session.revealed ? (
                             <div className="animate-fade-in">
@@ -176,7 +151,7 @@ export const PokerTable: React.FC = () => {
                         ) : (
                             <div className="flex flex-col items-center gap-4">
                                 <div className="text-ink-500 font-medium tracking-wide">
-                                    {session.players.filter(p => p.vote !== null).length} / {session.players.length} {t('game.votes')}
+                                    {session.players.filter((p) => p.vote !== null).length} / {session.players.length} {t('game.votes')}
                                 </div>
                                 <button
                                     onClick={() => revealVotes()}
@@ -191,22 +166,17 @@ export const PokerTable: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Players & Cards Orbiting */}
                 <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                     {sortedPlayers.map((player, index) => {
                         const { cardX, cardY, playerX, playerY, scale, rotationDeg } = getPositions(index, sortedPlayers.length);
                         const isMe = currentUser?.id === player.id;
 
-                        // Dynamic sizes based on scale
-                        // Base avatar size: w-10 (2.5rem = 40px) -> scale up to say 80px
-                        // Let's use style for size to be precise with scale
-                        const avatarSize = Math.max(40, 40 * scale * 1.5); // Min 40px, scale up
-                        const cardWidth = Math.max(56, 56 * scale); // Base w-14 (3.5rem = 56px)
-                        const cardHeight = Math.max(80, 80 * scale); // Base h-20 (5rem = 80px)
+                        const avatarSize = Math.max(40, 60 * scale);
+                        const cardWidth = Math.max(56, 56 * scale);
+                        const cardHeight = Math.max(80, 80 * scale);
 
                         return (
-                            <React.Fragment key={player.id}>
-                                {/* Card on Table */}
+                            <Fragment key={player.id}>
                                 <div
                                     className="absolute transition-all duration-700 ease-out flex items-center justify-center pointer-events-none"
                                     style={{
@@ -217,17 +187,14 @@ export const PokerTable: React.FC = () => {
                                     }}
                                 >
                                     <div className="relative w-full h-full">
-                                        <div className={`
-                                            w-full h-full rounded-lg shadow-xl transition-all duration-300
-                                            ${player.vote !== null ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}
-                                        `}>
+                                        <div
+                                            className={`w-full h-full rounded-lg shadow-xl transition-all duration-300 ${player.vote !== null ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+                                        >
                                             {!session.revealed ? (
-                                                /* Card Back */
                                                 <div className="absolute inset-0 bg-gradient-to-br from-accent to-accent-deep rounded-lg border-2 border-accent/30 flex items-center justify-center shadow-md">
                                                     <div className="w-[50%] h-[60%] border-2 border-dashed border-accent/30 rounded-sm" />
                                                 </div>
                                             ) : (
-                                                /* Card Front */
                                                 <div
                                                     className="absolute inset-0 bg-white text-ink-900 rounded-lg flex items-center justify-center font-bold border-2 border-ink-200 shadow-xl"
                                                     style={{ fontSize: `${Math.max(1.25, 1.25 * scale)}rem` }}
@@ -239,19 +206,17 @@ export const PokerTable: React.FC = () => {
                                     </div>
                                 </div>
 
-                                {/* Avatar Outside */}
                                 <div
                                     className="absolute transition-all duration-700 ease-out flex flex-col items-center justify-center"
                                     style={{
                                         transform: `translate(${playerX}px, ${playerY}px)`,
                                         zIndex: isMe ? 50 : 30,
-                                        width: `${avatarSize * 2.5}px` // Container width
+                                        width: `${avatarSize * 2.5}px`
                                     }}
                                 >
-                                    <div className={`
-                                        flex flex-col items-center gap-1 transition-all duration-300
-                                        ${player.vote !== null && !session.revealed ? 'opacity-100' : 'opacity-80'}
-                                    `}>
+                                    <div
+                                        className={`flex flex-col items-center gap-1 transition-all duration-300 ${player.vote !== null && !session.revealed ? 'opacity-100' : 'opacity-80'}`}
+                                    >
                                         <div
                                             className={`
                                                 rounded-full flex items-center justify-center font-bold border-2 shadow-lg z-20 relative
@@ -268,17 +233,14 @@ export const PokerTable: React.FC = () => {
                                             {player.name.charAt(0).toUpperCase()}
                                         </div>
                                         <span
-                                            className={`
-                                                font-medium px-2 py-0.5 rounded-full bg-ink-900/80 backdrop-blur border border-white/10 whitespace-nowrap
-                                                ${isMe ? 'text-accent-soft' : 'text-ink-400'}
-                                            `}
+                                            className={`font-medium px-2 py-0.5 rounded-full bg-ink-900/80 backdrop-blur border border-white/10 whitespace-nowrap ${isMe ? 'text-accent-soft' : 'text-ink-400'}`}
                                             style={{ fontSize: `${Math.max(0.75, 0.75 * scale * 1.2)}rem` }}
                                         >
                                             {player.name}
                                         </span>
                                     </div>
                                 </div>
-                            </React.Fragment>
+                            </Fragment>
                         );
                     })}
                 </div>
