@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { translations, Language } from '../i18n/translations';
+import { translations } from '../i18n/translations';
+import type { Language } from '../types';
 
 type LanguageContextType = {
     language: Language;
@@ -34,7 +35,6 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     );
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useLanguage = () => {
     const context = useContext(LanguageContext);
     if (context === undefined) {

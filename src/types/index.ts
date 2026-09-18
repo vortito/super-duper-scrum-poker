@@ -1,4 +1,8 @@
+import type { FieldValue, Timestamp } from 'firebase/firestore';
+
 export type Vote = number | '?' | null;
+
+export type Language = 'es' | 'en' | 'fr';
 
 export interface Player {
     id: string;
@@ -11,7 +15,7 @@ export interface Session {
     revealed: boolean;
     average: number | null;
     players: Player[];
-    createdAt: unknown; // Using any to support both number (legacy) and Firestore Timestamp/FieldValue
+    createdAt: number | Timestamp | FieldValue | null;
 }
 
 export interface SessionContextType {

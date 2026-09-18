@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { SessionProvider, useSession } from './context/SessionContext';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { PokerTable } from './components/PokerTable';
@@ -8,7 +8,7 @@ import { LanguageSelector } from './components/LanguageSelector';
 import { ThemeSelector } from './components/ThemeSelector';
 import { homeUrl, roomUrl } from './utils/url';
 
-const AppContent = () => {
+const AppContent: React.FC = () => {
     const { session } = useSession();
     const hadSession = useRef(false);
 
@@ -23,13 +23,11 @@ const AppContent = () => {
     }, [session]);
 
     return (
-        <>
-            {!session ? <WelcomeScreen /> : <PokerTable />}
-        </>
+        <>{!session ? <WelcomeScreen /> : <PokerTable />}</>
     );
 };
 
-function App() {
+export const App: React.FC = () => {
     return (
         <ThemeProvider>
             <LanguageProvider>
@@ -43,6 +41,4 @@ function App() {
             </LanguageProvider>
         </ThemeProvider>
     );
-}
-
-export default App;
+};

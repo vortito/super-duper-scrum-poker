@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
 import {
     doc,
     setDoc,
@@ -10,20 +10,35 @@ import {
     Timestamp,
     deleteDoc
 } from 'firebase/firestore';
-import { signInAnonymously } from 'firebase/auth';
+import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 import { db, auth } from '../services/firebase';
 import { Session, Player, Vote, SessionContextType } from '../types';
 import { useLanguage } from './LanguageContext';
 
+const SESSION_ID_KEY = 'scrum_poker_session_id';
+const USER_ID_KEY = 'scrum_poker_user_id';
+export const USER_NAME_KEY = 'scrum_poker_user_name';
+const SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000;
+
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useSession = () => {
     const context = useContext(SessionContext);
     if (!context) {
         throw new Error('useSession must be used within a SessionProvider');
     }
     return context;
+};
+
+const ensureSignedIn = async (): Promise<string> => {
+    const user = auth.currentUser ?? (await signInAnonymously(auth)).user;
+    return user.uid;
+};
+
+const getCreatedMillis = (createdAt: Session['createdAt'], now: number): number => {
+    if (typeof createdAt === 'number') return createdAt;
+    if (createdAt instanceof Timestamp) return createdAt.toMillis();
+    return now;
 };
 
 interface SessionProviderProps {
@@ -33,96 +48,95 @@ interface SessionProviderProps {
 export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
     const [session, setSession] = useState<Session | null>(null);
     const [currentUser, setCurrentUser] = useState<Player | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const unsubscribeRef = useRef<(() => void) | null>(null);
     const { t } = useLanguage();
 
-    // Persist user session locally
-    useEffect(() => {
-        const storedSessionId = localStorage.getItem('scrum_poker_session_id');
-        const storedUserId = localStorage.getItem('scrum_poker_user_id');
-        const storedUserName = localStorage.getItem('scrum_poker_user_name');
+    const stopSubscription = () => {
+        unsubscribeRef.current?.();
+        unsubscribeRef.current = null;
+    };
 
-        if (storedSessionId && storedUserId && storedUserName) {
-            // Attempt to reconnect
-            // We need to ensure auth is ready first, which is handled by the auth listener or just calling signInAnonymously
-            signInAnonymously(auth).then((userCredential) => {
-                // If the stored user ID matches the auth user (or we just trust the auth user)
-                // Ideally we use the auth.currentUser.uid as the player ID
-                if (userCredential.user.uid === storedUserId) {
-                    setCurrentUser({ id: storedUserId, name: storedUserName, vote: null });
-                    subscribeToSession(storedSessionId);
-                }
-            }).catch(err => console.error("Auto-reconnect failed", err));
-        }
-    }, []);
+    const clearStoredSession = () => {
+        localStorage.removeItem(SESSION_ID_KEY);
+        localStorage.removeItem(USER_ID_KEY);
+    };
 
     const subscribeToSession = (sessionId: string) => {
+        stopSubscription();
         setLoading(true);
         const sessionRef = doc(db, 'sessions', sessionId);
 
-        const unsubscribe = onSnapshot(sessionRef, (docSnap) => {
-            setLoading(false);
-            if (docSnap.exists()) {
-                const sessionData = docSnap.data() as Session;
+        unsubscribeRef.current = onSnapshot(
+            sessionRef,
+            (docSnap) => {
+                setLoading(false);
 
-                // Check for expiration (24 hours)
-                const SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000;
-                const now = Date.now();
-
-                let createdMillis: number;
-                if (typeof sessionData.createdAt === 'number') {
-                    createdMillis = sessionData.createdAt;
-                } else if (sessionData.createdAt instanceof Timestamp) {
-                    createdMillis = sessionData.createdAt.toMillis();
-                } else {
-                    // Fallback for pending writes or missing timestamps
-                    createdMillis = now;
+                if (!docSnap.exists()) {
+                    stopSubscription();
+                    clearStoredSession();
+                    setSession(null);
+                    setError(t('errors.sessionNotFound'));
+                    return;
                 }
 
-                if (now - createdMillis > SESSION_EXPIRY_MS) {
-                    console.log("Session expired, deleting from Firestore...");
-                    deleteDoc(sessionRef).catch(err => console.error("Error deleting expired session:", err));
+                const sessionData = docSnap.data() as Session;
+                const now = Date.now();
 
-                    setError(t('errors.sessionExpired'));
+                if (now - getCreatedMillis(sessionData.createdAt, now) > SESSION_EXPIRY_MS) {
+                    deleteDoc(sessionRef).catch((err) => console.error('Error deleting expired session:', err));
+                    stopSubscription();
+                    clearStoredSession();
                     setSession(null);
-                    localStorage.removeItem('scrum_poker_session_id');
-                    localStorage.removeItem('scrum_poker_user_id');
-                    localStorage.removeItem('scrum_poker_user_name');
+                    setError(t('errors.sessionExpired'));
                     return;
                 }
 
                 setSession(sessionData);
 
-                // Update current user state from the session data to keep sync
-                if (auth.currentUser) {
-                    const playerInSession = sessionData.players.find(p => p.id === auth.currentUser?.uid);
-                    if (playerInSession) {
-                        setCurrentUser(playerInSession);
-                    }
+                const uid = auth.currentUser?.uid;
+                const playerInSession = uid ? sessionData.players.find((p) => p.id === uid) : undefined;
+                if (playerInSession) {
+                    setCurrentUser(playerInSession);
                 }
-            } else {
-                setError(t('errors.sessionNotFound'));
-                setSession(null);
-                localStorage.removeItem('scrum_poker_session_id');
+            },
+            (err) => {
+                console.error('Session subscription error:', err);
+                setError(err.message);
+                setLoading(false);
             }
-        }, (err) => {
-            console.error("Session subscription error:", err);
-            setError(err.message);
-            setLoading(false);
+        );
+    };
+
+    const subscribeToSessionRef = useRef(subscribeToSession);
+    subscribeToSessionRef.current = subscribeToSession;
+
+    useEffect(() => {
+        const storedSessionId = localStorage.getItem(SESSION_ID_KEY);
+        const storedUserId = localStorage.getItem(USER_ID_KEY);
+        const storedUserName = localStorage.getItem(USER_NAME_KEY);
+
+        if (!storedSessionId || !storedUserId || !storedUserName) {
+            return;
+        }
+
+        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+            if (user?.uid !== storedUserId) {
+                return;
+            }
+            setCurrentUser({ id: storedUserId, name: storedUserName, vote: null });
+            subscribeToSessionRef.current(storedSessionId);
         });
 
-        return unsubscribe;
-    };
+        return unsubscribeAuth;
+    }, []);
 
     const createSession = async (playerName: string): Promise<string> => {
         setLoading(true);
         setError(null);
         try {
-            const userCredential = await signInAnonymously(auth);
-            const userId = userCredential.user.uid;
-
-            // Generate a simple 6-char ID for easier sharing
+            const userId = await ensureSignedIn();
             const sessionId = Math.random().toString(36).substring(2, 8).toUpperCase();
 
             const newPlayer: Player = { id: userId, name: playerName, vote: null };
@@ -137,9 +151,9 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
             await setDoc(doc(db, 'sessions', sessionId), newSession);
 
             setCurrentUser(newPlayer);
-            localStorage.setItem('scrum_poker_session_id', sessionId);
-            localStorage.setItem('scrum_poker_user_id', userId);
-            localStorage.setItem('scrum_poker_user_name', playerName);
+            localStorage.setItem(SESSION_ID_KEY, sessionId);
+            localStorage.setItem(USER_ID_KEY, userId);
+            localStorage.setItem(USER_NAME_KEY, playerName);
 
             subscribeToSession(sessionId);
             return sessionId;
@@ -154,8 +168,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
         setLoading(true);
         setError(null);
         try {
-            const userCredential = await signInAnonymously(auth);
-            const userId = userCredential.user.uid;
+            const userId = await ensureSignedIn();
 
             const sessionRef = doc(db, 'sessions', sessionId);
             const sessionSnap = await getDoc(sessionRef);
@@ -165,23 +178,19 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
             }
 
             const sessionData = sessionSnap.data() as Session;
-            const existingPlayer = sessionData.players.find(p => p.id === userId);
+            const existingPlayer = sessionData.players.find((p) => p.id === userId);
+            const player: Player = existingPlayer ?? { id: userId, name: playerName, vote: null };
 
             if (!existingPlayer) {
-                const newPlayer: Player = { id: userId, name: playerName, vote: null };
                 await updateDoc(sessionRef, {
-                    players: arrayUnion(newPlayer)
+                    players: arrayUnion(player)
                 });
-                setCurrentUser(newPlayer);
-            } else {
-                // If re-joining with same ID but maybe different name, update name? 
-                // For now just assume re-join
-                setCurrentUser(existingPlayer);
             }
 
-            localStorage.setItem('scrum_poker_session_id', sessionId);
-            localStorage.setItem('scrum_poker_user_id', userId);
-            localStorage.setItem('scrum_poker_user_name', playerName);
+            setCurrentUser(player);
+            localStorage.setItem(SESSION_ID_KEY, sessionId);
+            localStorage.setItem(USER_ID_KEY, userId);
+            localStorage.setItem(USER_NAME_KEY, playerName);
 
             subscribeToSession(sessionId);
         } catch (err: unknown) {
@@ -193,7 +202,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
 
     const checkSessionExists = async (sessionId: string): Promise<void> => {
         try {
-            await signInAnonymously(auth);
+            await ensureSignedIn();
             const sessionSnap = await getDoc(doc(db, 'sessions', sessionId));
             if (!sessionSnap.exists()) {
                 setError(t('errors.sessionNotFound'));
@@ -206,9 +215,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     const submitVote = async (vote: Vote) => {
         if (!session || !currentUser) return;
 
-        const updatedPlayers = session.players.map(p =>
-            p.id === currentUser.id ? { ...p, vote } : p
-        );
+        const updatedPlayers = session.players.map((p) => (p.id === currentUser.id ? { ...p, vote } : p));
 
         await updateDoc(doc(db, 'sessions', session.id), {
             players: updatedPlayers
@@ -218,16 +225,12 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     const revealVotes = async () => {
         if (!session) return;
 
-        // Calculate average
         const validVotes = session.players
-            .map(p => p.vote)
-            .filter(v => typeof v === 'number') as number[];
-
-        let average = null;
-        if (validVotes.length > 0) {
-            const sum = validVotes.reduce((a, b) => a + b, 0);
-            average = Number((sum / validVotes.length).toFixed(1));
-        }
+            .map((p) => p.vote)
+            .filter((v): v is number => typeof v === 'number');
+        const average = validVotes.length > 0
+            ? Number((validVotes.reduce((a, b) => a + b, 0) / validVotes.length).toFixed(1))
+            : null;
 
         await updateDoc(doc(db, 'sessions', session.id), {
             revealed: true,
@@ -238,7 +241,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     const resetSession = async () => {
         if (!session) return;
 
-        const resetPlayers = session.players.map(p => ({ ...p, vote: null }));
+        const resetPlayers = session.players.map((p) => ({ ...p, vote: null }));
 
         await updateDoc(doc(db, 'sessions', session.id), {
             revealed: false,
@@ -248,12 +251,10 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     };
 
     const leaveSession = () => {
+        stopSubscription();
+        clearStoredSession();
         setSession(null);
         setCurrentUser(null);
-        localStorage.removeItem('scrum_poker_session_id');
-        localStorage.removeItem('scrum_poker_user_id');
-        localStorage.removeItem('scrum_poker_user_name');
-        // Ideally remove player from DB too, but keeping it simple for now
     };
 
     return (
