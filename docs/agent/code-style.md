@@ -5,7 +5,8 @@ TypeScript everywhere, React function components, Tailwind.
 ## Language & formatting
 - TypeScript everywhere; React function components as named exports (`export const PokerTable: React.FC`).
 - 4-space indentation, single quotes, semicolons.
-- No comments: code must be clean and self-explanatory (clean code) — rely on well-chosen names instead of explanations. The only allowed exception is a functional lint directive (`eslint-disable`) when a rule cannot be satisfied otherwise.
+- No comments: code must be clean and self-explanatory (clean code) — rely on well-chosen names instead of explanations.
+- Lint exceptions, in order of preference (enforced by the `eslint-comments` plugin): (1) fix the root cause — a suppression is only legitimate when no fix exists; (2) systemic cases (a whole class of files that does not fit the rule, e.g. context providers) are disabled per file pattern in `eslint.config.js`, never in code; (3) isolated, justified cases use a line-scoped directive with a mandatory reason (`// eslint-disable-next-line rule -- reason`). Unlimited block disables (`/* eslint-disable */` without rule names) and directives without a reason are lint errors.
 
 ## Architecture rules
 - Shared domain types live in `src/types/index.ts`.

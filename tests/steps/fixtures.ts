@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/rules-of-hooks */
+/* eslint-disable react-hooks/rules-of-hooks -- Test fixtures call hooks outside a component to build the world; this is test scaffolding, not application code */
 import { test as base, createBdd } from 'playwright-bdd';
 import { expect, Page, Browser, BrowserContext } from '@playwright/test';
 
