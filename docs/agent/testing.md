@@ -39,6 +39,16 @@ tests/
 - **Page Objects** own the locators and expose intent-revealing methods (`clickVote`, `waitForReveal`, `getAverage`). They may assert on their own state but never on cross-page invariants (that belongs in steps).
 - **New page objects** go in `tests/pages/`. If a step needs to interact with a new UI area, create a page object first, then reference it from the step.
 
+## Locator strategy
+
+Locators follow a strict priority order; every page object must comply:
+
+1. **Role** — `page.getByRole(...)` with a stable, human-meaningful accessible name. Preferred wherever the element exposes one.
+2. **Test ID** — `page.getByTestId('...')` for elements without a stable accessible name (decorative or icon-only buttons, inputs without programmatic labels, dynamic values such as room codes, counters, board cards). `data-testid` attributes may be added to production code (`src/`) for this purpose.
+3. **User-provided text** — `page.getByText(...)` only for text the user entered themselves (e.g. a player's name in the participant list).
+
+Forbidden (fragile): CSS classes, CSS variables, placeholders, `title` attributes, structural selectors (tag names, `nth-child`), and UI label text as a locator — labels change with language. Asserting on UI text that *is* the behavior under test (e.g. the localized subtitle that proves a language switch) is allowed, but the element must still be located via priority 1 or 2.
+
 ## Conventions
 - ATDD: acceptance scenarios are written before the feature (`tests/features/<domain>.feature`); step definitions go in `tests/steps/<domain>.steps.ts` (auto-discovered via the `steps` glob).
 - Multiplayer scenarios drive one page per player with `world.createPlayer(name)` — each player gets a fresh, isolated `BrowserContext` (separate localStorage/auth).
