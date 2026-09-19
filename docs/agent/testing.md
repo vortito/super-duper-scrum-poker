@@ -51,6 +51,7 @@ Forbidden (fragile): CSS classes, CSS variables, placeholders, `title` attribute
 
 ## Conventions
 - ATDD: acceptance scenarios are written before the feature (`tests/features/<domain>.feature`); step definitions go in `tests/steps/<domain>.steps.ts` (auto-discovered via the `steps` glob).
+- **File naming**: a feature file and the step file implementing it share a base name that is the kebab-case of the feature's title — a feature titled `Theme Selection` lives in `tests/features/theme-selection.feature`, with its steps in `tests/steps/theme-selection.steps.ts`. Shared infrastructure files (`fixtures.ts`, orchestration helpers) are the exception.
 - Multiplayer scenarios drive one page per player with `world.createPlayer(name)` — each player gets a fresh, isolated `BrowserContext` (separate localStorage/auth).
 - Vote-related assertions must tolerate snapshot lag (see flakiness below).
 - Run the suite only via `npm run test` (or `npm run ui`); never `npx playwright test` directly — `bddgen` must run first.
