@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -35,7 +35,7 @@ jobs:
     # Use official Playwright image — Chromium and all system deps are pre-installed,
     # no need to run `npx playwright install --with-deps`.
     container:
-      image: mcr.microsoft.com/playwright:v1.62.1-noble
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
       options: --user 1001
 
     steps:
@@ -44,7 +44,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -54,7 +54,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       - name: Install Firebase CLI
         run: npm install -g firebase-tools

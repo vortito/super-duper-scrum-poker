@@ -12,7 +12,9 @@ export const WelcomeScreen: React.FC = () => {
     const [mode, setMode] = useState<'create' | 'join'>(() => (getRoomIdFromPath() ? 'join' : 'create'));
 
     const checkSessionExistsRef = useRef(checkSessionExists);
-    checkSessionExistsRef.current = checkSessionExists;
+    useEffect(() => {
+        checkSessionExistsRef.current = checkSessionExists;
+    });
 
     useEffect(() => {
         const roomFromPath = getRoomIdFromPath();

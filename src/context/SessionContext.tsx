@@ -110,7 +110,9 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     };
 
     const subscribeToSessionRef = useRef(subscribeToSession);
-    subscribeToSessionRef.current = subscribeToSession;
+    useEffect(() => {
+        subscribeToSessionRef.current = subscribeToSession;
+    });
 
     useEffect(() => {
         const storedSessionId = localStorage.getItem(SESSION_ID_KEY);
