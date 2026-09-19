@@ -2,13 +2,9 @@
 import { test as base, createBdd } from 'playwright-bdd';
 import { expect, Page, Browser, BrowserContext } from '@playwright/test';
 
-export const basePath = '/super-duper-scrum-poker/';
-export const roomLink = (id: string): string => `${basePath}room/${id}`;
-
 export class TestWorld {
     players: Record<string, { page: Page; context: BrowserContext }> = {};
     sessionId: string = '';
-    copiedBy: string = '';
     private contexts: BrowserContext[] = [];
 
     constructor(private browser: Browser) {}
@@ -35,16 +31,9 @@ export class TestWorld {
     }
 
     async cleanup(): Promise<void> {
-        for (const ctx of this.contexts) {
-            try {
-                await ctx.close();
-            } catch {
-                // ignore
-            }
-        }
+        await Promise.allSettled(this.contexts.map((ctx) => ctx.close()));
         this.players = {};
         this.contexts = [];
-        this.copiedBy = '';
     }
 }
 

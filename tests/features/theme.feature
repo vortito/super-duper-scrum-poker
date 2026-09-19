@@ -3,20 +3,17 @@ Feature: Theme Selection
   I want to choose the color theme of the interface
   So I can have a look that suits me
 
-  Scenario: The default theme is applied on first visit
-    Given a user visits the home screen
-    Then the active theme is "blue"
-    And the accent color is the color of the "blue" theme
+  Background:
+    Given "Alex" visits the home screen
 
-  Scenario: Selecting a theme changes the accent color
-    Given a user visits the home screen
-    When they select the theme "green"
-    Then the active theme is "green"
-    And the accent color is the color of the "green" theme
+  Scenario: The default theme is applied on first visit
+    Then "Alex" sees the "blue" theme active
+
+  Scenario: Selecting a theme changes the interface accent
+    When "Alex" selects the theme "green"
+    Then "Alex" sees the "green" theme active
 
   Scenario: The selected theme is kept after a reload
-    Given a user visits the home screen
-    When they select the theme "orange"
-    And the page is reloaded
-    Then the active theme is "orange"
-    And the accent color is the color of the "orange" theme
+    Given "Alex" has selected the theme "orange"
+    When "Alex" reloads the page
+    Then "Alex" sees the "orange" theme active

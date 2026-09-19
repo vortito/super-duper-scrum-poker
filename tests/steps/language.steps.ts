@@ -1,21 +1,18 @@
-import { When, Then, expect } from './fixtures';
+import { When, Then } from './fixtures';
+import { LanguageSelectorPage } from '../pages/language-selector.page';
+import { WelcomePage } from '../pages/welcome.page';
+import type { Language } from '../../src/types';
 
-When('they select the language {string}', async ({ page }, langCode: string) => {
-    const langButton = page.getByRole('button', { name: new RegExp(`^${langCode}$`, 'i'), exact: true });
-    await langButton.click();
+const LOCALE_BY_NAME: Record<string, Language> = {
+    English: 'en',
+    French: 'fr',
+    Spanish: 'es'
+};
+
+When('{string} selects the language {string}', async ({ world }, playerName: string, code: string) => {
+    await new LanguageSelectorPage(world.getPlayer(playerName)).select(code);
 });
 
-Then('the title and subtitle are shown in English', async ({ page }) => {
-    await expect(page.getByText('Collaborative Agile Estimation')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Start Session' })).toBeVisible();
-});
-
-Then('the title and subtitle are shown in French', async ({ page }) => {
-    await expect(page.getByText('Estimation Agile Collaborative')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Commencer la Session' })).toBeVisible();
-});
-
-Then('the title and subtitle are shown in Spanish', async ({ page }) => {
-    await expect(page.getByText('Estimación ágil colaborativa')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Comenzar Sesión' })).toBeVisible();
+Then('{string} sees the home screen displayed in {string}', async ({ world }, playerName: string, languageName: string) => {
+    await new WelcomePage(world.getPlayer(playerName)).expectContentIn(LOCALE_BY_NAME[languageName]);
 });

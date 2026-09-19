@@ -1,63 +1,33 @@
-import { Given, When, Then, expect, roomLink } from './fixtures';
+import { When, Then } from './fixtures';
+import { PokerTablePage } from '../pages/poker-table.page';
 
-When('{string} clicks on {string}', async ({ world }, playerName: string, buttonName: string) => {
-    const page = world.getPlayer(playerName);
-    await page.getByRole('button', { name: buttonName }).click();
+When('{string} reveals the cards', async ({ world }, playerName: string) => {
+    await new PokerTablePage(world.getPlayer(playerName)).reveal();
 });
 
-Then('the cards are revealed showing {string} and {string} on the board', async ({ world }, card1: string, card2: string) => {
-    // Check on first player's page
-    const page1 = Object.values(world.players)[0].page;
-    await expect(page1.getByRole('main').getByText(card1, { exact: true })).toBeVisible({ timeout: 5000 });
-    await expect(page1.getByRole('main').getByText(card2, { exact: true })).toBeVisible({ timeout: 5000 });
+When('{string} starts a new round', async ({ world }, playerName: string) => {
+    await new PokerTablePage(world.getPlayer(playerName)).startNewRound();
 });
 
-Then('the average displayed on screen is {string}', async ({ world }, averageValue: string) => {
-    for (const player of Object.values(world.players)) {
-        await expect(player.page.getByText('Promedio')).toBeVisible({ timeout: 5000 });
-        await expect(player.page.getByText(averageValue)).toBeVisible({ timeout: 5000 });
+Then('the board shows {string} voting {string} and {string} voting {string}', async ({ world }, name1: string, value1: string, name2: string, value2: string) => {
+    const table = new PokerTablePage(world.getPlayer(name1));
+    await table.expectBoardCard(name1, value1);
+    await table.expectBoardCard(name2, value2);
+});
+
+Then('the average displayed is {string}', async ({ world }, value: string) => {
+    for (const name of Object.keys(world.players)) {
+        await new PokerTablePage(world.getPlayer(name)).expectAverage(value);
     }
 });
 
-Then('the consensus message {string} is shown with the agreed value {string}', async ({ world }, consensusTitle: string, agreedValue: string) => {
-    for (const player of Object.values(world.players)) {
-        await expect(player.page.getByText(consensusTitle)).toBeVisible({ timeout: 5000 });
-        await expect(player.page.locator('.text-2xl', { hasText: agreedValue })).toBeVisible({ timeout: 5000 });
+Then('the consensus is shown with the agreed value {string}', async ({ world }, value: string) => {
+    for (const name of Object.keys(world.players)) {
+        await new PokerTablePage(world.getPlayer(name)).expectConsensus(value);
     }
 });
 
-Given('a room with revealed votes between {string} and {string}', async ({ world }, hostName: string, guestName: string) => {
-    // 1. Host creates room
-    const hostPage = await world.createPlayer(hostName);
-    await hostPage.goto('/');
-    await hostPage.getByPlaceholder('Ej. Ana, Juan...').fill(hostName);
-    await hostPage.getByRole('button', { name: 'Comenzar Sesión' }).click();
-
-    await expect(hostPage.getByText(/Sala:/i)).toBeVisible({ timeout: 15000 });
-    const roomText = await hostPage.getByText(/Sala:/i).textContent();
-    world.sessionId = roomText?.split(':')[1]?.trim() || '';
-
-    // 2. Guest joins room
-    const guestPage = await world.createPlayer(guestName);
-    await guestPage.goto(roomLink(world.sessionId));
-    await guestPage.getByPlaceholder('Ej. Ana, Juan...').fill(guestName);
-    await guestPage.getByRole('button', { name: 'Entrar a la Sala' }).click();
-
-    await expect(hostPage.getByText(guestName)).toBeVisible({ timeout: 10000 });
-    await expect(guestPage.getByText(hostName)).toBeVisible({ timeout: 10000 });
-
-    // 3. Vote and reveal
-    await hostPage.getByRole('button', { name: /^5(\s+5)*$/ }).click();
-    await guestPage.getByRole('button', { name: /^8(\s+8)*$/ }).click();
-    await expect(hostPage.getByText('2 / 2 votos')).toBeVisible({ timeout: 5000 });
-
-    await hostPage.getByRole('button', { name: 'Revelar Cartas' }).click();
-    await expect(hostPage.getByText('Promedio')).toBeVisible({ timeout: 5000 });
-});
-
-Then('the board cards are hidden and votes reset to {string}', async ({ world }, resetVoteCount: string) => {
-    for (const player of Object.values(world.players)) {
-        await expect(player.page.getByText(resetVoteCount)).toBeVisible({ timeout: 5000 });
-        await expect(player.page.getByRole('button', { name: 'Revelar Cartas' })).toBeVisible({ timeout: 5000 });
-    }
+Then('the cards of {string} and {string} are hidden on the table', async ({ world }, name1: string, name2: string) => {
+    await new PokerTablePage(world.getPlayer(name1)).expectBoardCardHidden(name1);
+    await new PokerTablePage(world.getPlayer(name2)).expectBoardCardHidden(name2);
 });

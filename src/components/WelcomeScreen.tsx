@@ -47,7 +47,7 @@ export const WelcomeScreen: React.FC = () => {
                     <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-accent-soft to-accent-secondary bg-clip-text text-transparent">
                         {t('welcome.title')}
                     </h1>
-                    <p className="text-ink-400">{t('welcome.subtitle')}</p>
+                    <p className="text-ink-400" data-testid="welcome-subtitle">{t('welcome.subtitle')}</p>
                 </div>
 
                 <div className="flex gap-2 mb-6 p-1 bg-ink-900/50 rounded-lg border border-white/5">
@@ -70,6 +70,7 @@ export const WelcomeScreen: React.FC = () => {
                         <label className="block text-sm font-medium text-ink-300 mb-1.5 ml-1">{t('welcome.nameLabel')}</label>
                         <input
                             type="text"
+                            data-testid="name-input"
                             className="w-full bg-ink-900/50 border border-ink-700 rounded-xl px-4 py-3 text-white placeholder:text-ink-500 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all shadow-sm"
                             placeholder={t('welcome.namePlaceholder')}
                             value={name}
@@ -83,6 +84,7 @@ export const WelcomeScreen: React.FC = () => {
                             <label className="block text-sm font-medium text-ink-300 mb-1.5 ml-1">{t('welcome.sessionLabel')}</label>
                             <input
                                 type="text"
+                                data-testid="room-id-input"
                                 className="w-full bg-ink-900/50 border border-ink-700 rounded-xl px-4 py-3 text-white placeholder:text-ink-500 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all shadow-sm uppercase tracking-wider font-mono"
                                 placeholder={t('welcome.sessionPlaceholder')}
                                 value={sessionId}
@@ -93,13 +95,17 @@ export const WelcomeScreen: React.FC = () => {
                     )}
 
                     {error && (
-                        <div className="p-3 bg-danger/10 border border-danger/20 rounded-lg text-danger text-sm flex items-center justify-center">
+                        <div
+                            data-testid="error-message"
+                            className="p-3 bg-danger/10 border border-danger/20 rounded-lg text-danger text-sm flex items-center justify-center"
+                        >
                             {error}
                         </div>
                     )}
 
                     <button
                         type="submit"
+                        data-testid="submit-button"
                         disabled={loading || !name}
                         className="w-full bg-gradient-to-r from-accent to-accent-secondary hover:brightness-110 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-accent/25 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 border border-white/10 flex items-center justify-center gap-2 mt-2"
                     >
