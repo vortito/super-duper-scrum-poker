@@ -41,7 +41,7 @@ export const PokerTable: React.FC = () => {
 
         const firstVote = allVotes[0];
         return allVotes.every((v) => v === firstVote) ? firstVote : null;
-    }, [session?.revealed, session?.players]);
+    }, [session]);
 
     const sortedPlayers = useMemo(() => {
         if (!session || !currentUser) return session?.players || [];
