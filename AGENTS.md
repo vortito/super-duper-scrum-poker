@@ -90,7 +90,7 @@ Implementation of a spec follows this ATDD lifecycle, from branch to merge:
 
 ## Commands
 
-- `npm run test` — full BDD E2E suite. Always use this (or `npm run ui` for Playwright UI mode); it runs `bddgen` first. Never run `npx playwright test` directly: spec files are generated, not committed.
+- `npm run test` — full BDD E2E suite. Always use this (or `npm run test-ui` for Playwright UI mode); it cleans `.features-gen`, runs `bddgen`, then Playwright. Never run `npx playwright test` directly: spec files are generated, not committed.
 - Single scenario: `npm run test -- -g "scenario title"`.
 - `npm run lint` — ESLint 9 (flat config in `eslint.config.js`).
 - `npm run build` — `tsc -b && vite build`. There is no separate typecheck script; `tsc -b` inside build is it.

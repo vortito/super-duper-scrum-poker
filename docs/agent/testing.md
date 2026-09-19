@@ -54,7 +54,7 @@ Forbidden (fragile): CSS classes, CSS variables, placeholders, `title` attribute
 - **File naming**: a feature file and the step file implementing it share a base name that is the kebab-case of the feature's title — a feature titled `Theme Selection` lives in `tests/features/theme-selection.feature`, with its steps in `tests/steps/theme-selection.steps.ts`. Shared infrastructure files (`fixtures.ts`, orchestration helpers) are the exception.
 - Multiplayer scenarios drive one page per player with `world.createPlayer(name)` — each player gets a fresh, isolated `BrowserContext` (separate localStorage/auth).
 - Vote-related assertions must tolerate snapshot lag (see flakiness below).
-- Run the suite only via `npm run test` (or `npm run ui`); never `npx playwright test` directly — `bddgen` must run first.
+- Run the suite only via `npm run test` (or `npm run test-ui`); never `npx playwright test` directly — the script cleans `.features-gen` first and `bddgen` must run before Playwright. If `bddgen` fails (e.g. missing step definitions), its errors are printed to the console and the run stops before any test executes.
 - Generated specs (`.features-gen/**`) are a build artifact: never commit or hand-edit them.
 - Tests must target the local Firebase emulators, never real Firebase.
 
