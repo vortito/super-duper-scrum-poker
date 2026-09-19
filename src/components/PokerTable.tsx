@@ -75,7 +75,7 @@ export const PokerTable: React.FC = () => {
         const playerX = Math.cos(angle) * playerRx;
         const playerY = Math.sin(angle) * playerRy;
 
-        const rotationDeg = angle * (180 / Math.PI) + 90;
+        const rotationDeg = angle * (180 / Math.PI) + 270;
 
         return { cardX, cardY, playerX, playerY, scale, rotationDeg };
     };

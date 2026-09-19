@@ -14,3 +14,8 @@ Feature: Voting with Estimation Cards
     Given "Alice" has voted with the card "3"
     When "Alice" changes their vote to the card "8"
     Then the selected card of "Alice" is "8"
+
+  Scenario: Board card is oriented facing the table center
+    Given an active room with "Alice" and "Bob"
+    Given "Alice" has voted with the card "5"
+    Then the board card of "Alice" faces the table center

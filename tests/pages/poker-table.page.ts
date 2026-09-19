@@ -76,6 +76,13 @@ export class PokerTablePage {
         await expect(this.boardCard(playerName)).toHaveText('');
     }
 
+    async expectBoardCardFacesCenter(playerName: string): Promise<void> {
+        const card = this.boardCard(playerName);
+        await expect(card).toBeVisible({ timeout: 5000 });
+        const style = (await card.getAttribute('style')) ?? '';
+        expect(style).toContain('rotate(360deg)');
+    }
+
     async expectAverage(value: string): Promise<void> {
         await expect(this.averageValue).toHaveText(value, { timeout: 5000 });
     }
