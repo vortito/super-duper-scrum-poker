@@ -92,8 +92,16 @@ export const PokerTable: React.FC = () => {
                     <div>
                         <h1 className="text-sm font-bold text-ink-200">{t('welcome.title')}</h1>
                         <div className="flex items-center gap-2 text-xs text-ink-400">
-                            <span>{t('game.room')}: {session.id}</span>
-                            <button onClick={copyLink} className="hover:text-white transition-colors" title={t('game.copy')}>
+                            <span>
+                                <span>{t('game.room')}:</span>{' '}
+                                <span data-testid="room-code">{session.id}</span>
+                            </span>
+                            <button
+                                data-testid="copy-link-button"
+                                onClick={copyLink}
+                                className="hover:text-white transition-colors"
+                                title={t('game.copy')}
+                            >
                                 <Copy size={12} />
                             </button>
                         </div>
@@ -128,19 +136,20 @@ export const PokerTable: React.FC = () => {
                                             {t('game.deal')}
                                         </h2>
                                         <div className="text-xl text-ink-400 font-medium">
-                                            {t('game.agreed')} <span className="text-white font-bold text-2xl">{consensus}</span>
+                                            {t('game.agreed')} <span data-testid="consensus-value" className="text-white font-bold text-2xl">{consensus}</span>
                                         </div>
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center">
                                         <span className="text-ink-500 text-xs uppercase tracking-widest mb-1">{t('game.average')}</span>
-                                        <span className="text-6xl font-bold text-white drop-shadow-lg">
+                                        <span data-testid="average-value" className="text-6xl font-bold text-white drop-shadow-lg">
                                             {session.average}
                                         </span>
                                     </div>
                                 )}
 
                                 <button
+                                    data-testid="new-round-button"
                                     onClick={() => resetSession()}
                                     className="mt-8 flex items-center gap-2 px-6 py-3 bg-ink-700 hover:bg-ink-600 rounded-full text-white font-medium transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 mx-auto"
                                 >
@@ -150,10 +159,11 @@ export const PokerTable: React.FC = () => {
                             </div>
                         ) : (
                             <div className="flex flex-col items-center gap-4">
-                                <div className="text-ink-500 font-medium tracking-wide">
+                                <div data-testid="vote-count" className="text-ink-500 font-medium tracking-wide">
                                     {session.players.filter((p) => p.vote !== null).length} / {session.players.length} {t('game.votes')}
                                 </div>
                                 <button
+                                    data-testid="reveal-button"
                                     onClick={() => revealVotes()}
                                     className="group relative px-8 py-4 bg-accent hover:brightness-110 rounded-full text-white font-bold shadow-lg shadow-accent/25 transition-all hover:scale-105 active:scale-95"
                                 >
@@ -178,6 +188,7 @@ export const PokerTable: React.FC = () => {
                         return (
                             <Fragment key={player.id}>
                                 <div
+                                    data-testid={`board-card-${player.name}`}
                                     className="absolute transition-all duration-700 ease-out flex items-center justify-center pointer-events-none"
                                     style={{
                                         transform: `translate(${cardX}px, ${cardY}px) rotate(${rotationDeg}deg)`,

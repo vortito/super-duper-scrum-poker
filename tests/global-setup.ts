@@ -9,37 +9,33 @@ const __dirname = path.dirname(__filename);
 const PID_FILE = path.join(__dirname, '.emulator.pid');
 const EMULATOR_PORTS = ['8085', '9099', '4400', '4500', '9150'];
 
-/**
- * Attempts to kill processes on the given ports using available system tools.
- * Falls back gracefully when fuser/lsof are not installed (e.g. Playwright Docker image).
- */
+function killProcess(pid: number): void {
+    try {
+        process.kill(pid, 'SIGKILL');
+    } catch (err) {
+        if ((err as NodeJS.ErrnoException).code !== 'ESRCH') {
+            throw err;
+        }
+    }
+}
+
 function clearPorts(ports: string[]): void {
-    // Try fuser first (standard on most Linux distros)
     const fuserCheck = spawnSync('which', ['fuser']);
     if (fuserCheck.status === 0) {
         spawnSync('fuser', ['-k', ...ports.map((p) => `${p}/tcp`)]);
         return;
     }
 
-    // Fall back to lsof (available on macOS and some Linux images)
     const lsofCheck = spawnSync('which', ['lsof']);
     if (lsofCheck.status === 0) {
         for (const port of ports) {
             const result = spawnSync('lsof', ['-ti', `tcp:${port}`]);
             const pids = result.stdout.toString().trim().split('\n').filter(Boolean);
             for (const pid of pids) {
-                try {
-                    process.kill(parseInt(pid, 10), 'SIGKILL');
-                } catch {
-                    // already dead
-                }
+                killProcess(parseInt(pid, 10));
             }
         }
-        return;
     }
-
-    // No tool available — skip silently (CI environment with fresh containers
-    // will never have stale port bindings anyway)
 }
 
 async function globalSetup() {

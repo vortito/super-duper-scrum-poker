@@ -1,32 +1,35 @@
-Feature: Room and Participant Management
+Feature: Room Creation and Participation
   As a facilitator or agile team participant
   I want to create rooms and join existing sessions
-  So I can estimate user stories as a team
+  So I can estimate user stories together as a team
 
-  Scenario: Successfully create a new estimation room
-    Given a user visits the home screen
-    When they create a room with the name "Alice"
-    Then they see the room board with a unique identifier
-    And "Alice" appears in the participant list
+  Scenario: Creating a new estimation room
+    Given "Alice" visits the home screen
+    When "Alice" creates a room
+    Then "Alice" sees the room identifier on the board
+    Then "Alice" appears in the participant list
 
-  Scenario: Join an existing room via direct link
+  Scenario: The invitation link pre-fills the room code in the join form
     Given "Alice" has created an estimation room
-    When "Bob" accesses the room via the invitation link
-    And confirms their entry with the name "Bob"
-    Then "Bob" enters the room
-    And "Alice" and "Bob" can see each other in the estimation room
+    When "Bob" opens the invitation link for that room
+    Then "Bob" sees the room code pre-filled in the join form
 
-  Scenario: Required field validation on the form
-    Given a user visits the home screen
-    Then the start session button is disabled when the name is empty
+  Scenario: Joining a room via the invitation link
+    Given "Alice" has created an estimation room
+    When "Bob" joins the room via the invitation link with the name "Bob"
+    Then "Alice" and "Bob" can see each other in the room
 
-  Scenario: Opening a link to a room that does not exist
-    Given a user visits the home screen
-    When they open the invitation link for the room "ZZZZZZ"
-    Then they see the room code "ZZZZZZ" pre-filled in the join form
-    And they see an error message that the room does not exist
+  Scenario: The start session button is disabled until a name is entered
+    Given "Alice" visits the home screen
+    Then "Alice" sees the start session button disabled
+
+  Scenario: Opening the invitation link of a room that does not exist
+    Given "Alice" visits the home screen
+    When "Alice" opens the invitation link for the room "ZZZZZZ"
+    Then "Alice" sees the room code "ZZZZZZ" pre-filled in the join form
+    Then "Alice" sees an error that the room does not exist
 
   Scenario: Copying the room link copies the current room URL
     Given "Alice" has created an estimation room
     When "Alice" clicks the copy link button
-    Then the clipboard contains the current room URL
+    Then "Alice" clipboard contains the current room URL

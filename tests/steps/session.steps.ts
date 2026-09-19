@@ -1,102 +1,62 @@
-import { Given, When, Then, expect, roomLink } from './fixtures';
+import { Given, When, Then, expect } from './fixtures';
+import { createRoom, joinRoom } from './orchestration.steps';
+import { WelcomePage } from '../pages/welcome.page';
+import { PokerTablePage } from '../pages/poker-table.page';
 
-Given('a user visits the home screen', async ({ page }) => {
-    await page.goto('/');
+Given('{string} visits the home screen', async ({ world }, playerName: string) => {
+    await new WelcomePage(await world.createPlayer(playerName)).openHome();
 });
 
-When('they create a room with the name {string}', async ({ page, world }, name: string) => {
-    await page.getByPlaceholder('Ej. Ana, Juan...').fill(name);
-    const button = page.getByRole('button', { name: 'Comenzar Sesión' });
-    await expect(button).toBeEnabled();
-    await button.click();
-
-    await expect(page.getByText(/Sala:/i)).toBeVisible({ timeout: 15000 });
-    const roomText = await page.getByText(/Sala:/i).textContent();
-    world.sessionId = roomText?.split(':')[1]?.trim() || '';
-    world.players[name] = { page, context: page.context() };
+When('{string} creates a room', async ({ world }, playerName: string) => {
+    await createRoom(world, playerName);
 });
 
-Then('they see the room board with a unique identifier', async ({ page, world }) => {
-    expect(world.sessionId.length).toBeGreaterThan(0);
-    await expect(page.getByText(new RegExp(`Sala:\\s*${world.sessionId}`, 'i'))).toBeVisible();
-    await expect(page).toHaveURL(new RegExp(`room/${world.sessionId}$`));
+Then('{string} sees the room identifier on the board', async ({ world }, playerName: string) => {
+    await new PokerTablePage(world.getPlayer(playerName)).expectRoomCode(world.sessionId);
 });
 
-Then('{string} appears in the participant list', async ({ page }, name: string) => {
-    await expect(page.getByText(name)).toBeVisible();
+Then('{string} appears in the participant list', async ({ world }, playerName: string) => {
+    await new PokerTablePage(world.getPlayer(playerName)).expectParticipant(playerName);
 });
 
-Given('{string} has created an estimation room', async ({ world }, hostName: string) => {
-    const page = await world.createPlayer(hostName);
-    await page.goto('/');
-    await page.getByPlaceholder('Ej. Ana, Juan...').fill(hostName);
-    await page.getByRole('button', { name: 'Comenzar Sesión' }).click();
-
-    await expect(page.getByText(/Sala:/i)).toBeVisible({ timeout: 15000 });
-    const roomText = await page.getByText(/Sala:/i).textContent();
-    world.sessionId = roomText?.split(':')[1]?.trim() || '';
-    expect(world.sessionId.length).toBeGreaterThan(0);
+When('{string} opens the invitation link for that room', async ({ world }, playerName: string) => {
+    await new WelcomePage(await world.createPlayer(playerName)).openInviteLink(world.sessionId);
 });
 
-When('{string} accesses the room via the invitation link', async ({ world }, playerName: string) => {
-    const page = await world.createPlayer(playerName);
-    await page.goto(roomLink(world.sessionId));
-    const sessionInput = page.getByPlaceholder('Ej. X7Y2Z9');
-    await expect(sessionInput).toBeVisible();
-    await expect(sessionInput).toHaveValue(world.sessionId);
+Then('{string} sees the room code pre-filled in the join form', async ({ world }, playerName: string) => {
+    await new WelcomePage(world.getPlayer(playerName)).expectRoomCodePrefilled(world.sessionId);
 });
 
-When('confirms their entry with the name {string}', async ({ world }, playerName: string) => {
-    const page = world.getPlayer(playerName);
-    await page.getByPlaceholder('Ej. Ana, Juan...').fill(playerName);
-    await page.getByRole('button', { name: 'Entrar a la Sala' }).click();
+When('{string} joins the room via the invitation link with the name {string}', async ({ world }, playerName: string, name: string) => {
+    await joinRoom(world, name, world.sessionId);
 });
 
-Then('{string} enters the room', async ({ world }, playerName: string) => {
-    const page = world.getPlayer(playerName);
-    await expect(page.getByText(/Sala:/i)).toBeVisible({ timeout: 15000 });
+Then('{string} and {string} can see each other in the room', async ({ world }, name1: string, name2: string) => {
+    await new PokerTablePage(world.getPlayer(name1)).expectParticipant(name2);
+    await new PokerTablePage(world.getPlayer(name2)).expectParticipant(name1);
 });
 
-Then('{string} and {string} can see each other in the estimation room', async ({ world }, name1: string, name2: string) => {
-    const page1 = world.getPlayer(name1);
-    const page2 = world.getPlayer(name2);
-
-    await expect(page1.getByText(name1)).toBeVisible();
-    await expect(page1.getByText(name2)).toBeVisible();
-
-    await expect(page2.getByText(name1)).toBeVisible();
-    await expect(page2.getByText(name2)).toBeVisible();
+Then('{string} sees the start session button disabled', async ({ world }, playerName: string) => {
+    await new WelcomePage(world.getPlayer(playerName)).expectSubmitDisabled();
 });
 
-Then('the start session button is disabled when the name is empty', async ({ page }) => {
-    const nameInput = page.getByPlaceholder('Ej. Ana, Juan...');
-    await nameInput.fill('');
-    const startButton = page.getByRole('button', { name: 'Comenzar Sesión' });
-    await expect(startButton).toBeDisabled();
+When('{string} opens the invitation link for the room {string}', async ({ world }, playerName: string, roomId: string) => {
+    await new WelcomePage(await world.createPlayer(playerName)).openInviteLink(roomId);
 });
 
-When('they open the invitation link for the room {string}', async ({ page }, roomId: string) => {
-    await page.goto(roomLink(roomId));
+Then('{string} sees the room code {string} pre-filled in the join form', async ({ world }, playerName: string, roomId: string) => {
+    await new WelcomePage(world.getPlayer(playerName)).expectRoomCodePrefilled(roomId);
 });
 
-Then('they see the room code {string} pre-filled in the join form', async ({ page }, roomId: string) => {
-    const sessionInput = page.getByPlaceholder('Ej. X7Y2Z9');
-    await expect(sessionInput).toBeVisible();
-    await expect(sessionInput).toHaveValue(roomId);
-});
-
-Then('they see an error message that the room does not exist', async ({ page }) => {
-    await expect(page.getByText('La sala no existe')).toBeVisible({ timeout: 15000 });
+Then('{string} sees an error that the room does not exist', async ({ world }, playerName: string) => {
+    await new WelcomePage(world.getPlayer(playerName)).expectSessionNotFound();
 });
 
 When('{string} clicks the copy link button', async ({ world }, playerName: string) => {
-    const page = world.getPlayer(playerName);
-    world.copiedBy = playerName;
-    await page.getByTitle('Copiar enlace').click();
+    await new PokerTablePage(world.getPlayer(playerName)).copyLink();
 });
 
-Then('the clipboard contains the current room URL', async ({ world }) => {
-    const page = world.getPlayer(world.copiedBy);
-    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
-    expect(clipboardText).toBe(page.url());
+Then('{string} clipboard contains the current room URL', async ({ world }, playerName: string) => {
+    const table = new PokerTablePage(world.getPlayer(playerName));
+    expect(await table.readClipboard()).toBe(table.getUrl());
 });

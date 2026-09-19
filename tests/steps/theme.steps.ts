@@ -1,34 +1,22 @@
-import { When, Then, expect } from './fixtures';
-import { Page, Locator } from '@playwright/test';
+import { Given, When, Then } from './fixtures';
+import { ThemeSelectorPage } from '../pages/theme-selector.page';
+import { WelcomePage } from '../pages/welcome.page';
+import type { ThemeName } from '../../src/context/ThemeContext';
 
-const ACCENT_COLORS: Record<string, string> = {
-    blue: '#6366f1',
-    green: '#10b981',
-    pink: '#ec4899',
-    orange: '#f97316',
-    cyan: '#06b6d4',
-};
-
-const themeSwatch = (page: Page, name: string): Locator =>
-    page.getByRole('button', { name, exact: true });
-
-const readAccent = async (page: Page): Promise<string> =>
-    page.evaluate(() =>
-        getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim().toLowerCase()
-    );
-
-When('they select the theme {string}', async ({ page }, name: string) => {
-    await themeSwatch(page, name).click();
+Given('{string} has selected the theme {string}', async ({ world }, playerName: string, themeName: string) => {
+    await new ThemeSelectorPage(world.getPlayer(playerName)).select(themeName as ThemeName);
 });
 
-When('the page is reloaded', async ({ page }) => {
-    await page.reload();
+When('{string} selects the theme {string}', async ({ world }, playerName: string, themeName: string) => {
+    await new ThemeSelectorPage(world.getPlayer(playerName)).select(themeName as ThemeName);
 });
 
-Then('the active theme is {string}', async ({ page }, name: string) => {
-    await expect(themeSwatch(page, name)).toHaveAttribute('aria-pressed', 'true');
+When('{string} reloads the page', async ({ world }, playerName: string) => {
+    await new WelcomePage(world.getPlayer(playerName)).reload();
 });
 
-Then('the accent color is the color of the {string} theme', async ({ page }, name: string) => {
-    await expect.poll(() => readAccent(page)).toBe(ACCENT_COLORS[name]);
+Then('{string} sees the {string} theme active', async ({ world }, playerName: string, themeName: string) => {
+    const themes = new ThemeSelectorPage(world.getPlayer(playerName));
+    await themes.expectActive(themeName as ThemeName);
+    await themes.expectAccentApplied(themeName as ThemeName);
 });
