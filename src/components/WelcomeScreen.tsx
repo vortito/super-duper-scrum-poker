@@ -3,6 +3,7 @@ import { useSession, USER_NAME_KEY } from '../context/SessionContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Users, Play } from 'lucide-react';
 import { getRoomIdFromPath } from '../utils/url';
+import { cn } from '../utils/cn';
 
 export const WelcomeScreen: React.FC = () => {
     const { createSession, joinSession, checkSessionExists, loading, error } = useSession();
@@ -54,13 +55,13 @@ export const WelcomeScreen: React.FC = () => {
 
                 <div className="flex gap-2 mb-6 p-1 bg-ink-900/50 rounded-lg border border-white/5">
                     <button
-                        className={`flex-1 py-2 rounded-md text-sm font-medium transition-all duration-300 ${mode === 'create' ? 'bg-accent text-white shadow-lg shadow-accent/20 ring-1 ring-accent-soft/50' : 'text-ink-400 hover:text-white hover:bg-white/5'}`}
+                        className={cn('flex-1 py-2 rounded-md text-sm font-medium transition-all duration-300', mode === 'create' ? 'bg-accent text-white shadow-lg shadow-accent/20 ring-1 ring-accent-soft/50' : 'text-ink-400 hover:text-white hover:bg-white/5')}
                         onClick={() => setMode('create')}
                     >
                         {t('welcome.create')}
                     </button>
                     <button
-                        className={`flex-1 py-2 rounded-md text-sm font-medium transition-all duration-300 ${mode === 'join' ? 'bg-accent text-white shadow-lg shadow-accent/20 ring-1 ring-accent-soft/50' : 'text-ink-400 hover:text-white hover:bg-white/5'}`}
+                        className={cn('flex-1 py-2 rounded-md text-sm font-medium transition-all duration-300', mode === 'join' ? 'bg-accent text-white shadow-lg shadow-accent/20 ring-1 ring-accent-soft/50' : 'text-ink-400 hover:text-white hover:bg-white/5')}
                         onClick={() => setMode('join')}
                     >
                         {t('welcome.join')}
