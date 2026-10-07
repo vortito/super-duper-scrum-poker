@@ -2,6 +2,7 @@ import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { LANGUAGES } from '../i18n/translations';
 import { Globe } from 'lucide-react';
+import { cn } from '../utils/cn';
 
 export const LanguageSelector: React.FC = () => {
     const { language, setLanguage } = useLanguage();
@@ -14,7 +15,7 @@ export const LanguageSelector: React.FC = () => {
                     <button
                         key={lang}
                         onClick={() => setLanguage(lang)}
-                        className={`px-2 py-1 rounded-md text-xs font-bold uppercase transition-all ${language === lang ? 'bg-accent text-white shadow-sm' : 'text-ink-400 hover:text-white hover:bg-white/5'}`}
+                        className={cn('px-2 py-1 rounded-md text-xs font-bold uppercase transition-all', language === lang ? 'bg-accent text-white shadow-sm' : 'text-ink-400 hover:text-white hover:bg-white/5')}
                     >
                         {lang}
                     </button>

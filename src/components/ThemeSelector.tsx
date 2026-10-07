@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTheme, THEMES, THEME_ORDER } from '../context/ThemeContext';
 import { Palette } from 'lucide-react';
+import { cn } from '../utils/cn';
 
 export const ThemeSelector: React.FC = () => {
     const { theme, setTheme } = useTheme();
@@ -20,7 +21,7 @@ export const ThemeSelector: React.FC = () => {
                             title={name}
                             aria-label={name}
                             aria-pressed={active}
-                            className={`w-5 h-5 rounded-full transition-all duration-200 ${active ? 'ring-2 ring-white scale-110' : 'ring-1 ring-white/20 hover:scale-110'}`}
+                            className={cn('w-5 h-5 rounded-full transition-all duration-200', active ? 'ring-2 ring-white scale-110' : 'ring-1 ring-white/20 hover:scale-110')}
                             style={{ background: `linear-gradient(135deg, ${vars.soft}, ${vars.secondary})` }}
                         />
                     );

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSession } from '../context/SessionContext';
 import { Vote } from '../types';
+import { cn } from '../utils/cn';
 
 const CARDS: Vote[] = [1, 2, 3, 5, 8, 13, 21, '?'];
 
@@ -26,7 +27,7 @@ export const VotingCards: React.FC = () => {
         >
             <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/80 to-transparent pointer-events-none" />
 
-            <div className={`relative flex items-end justify-center transition-all duration-500 px-4 pb-8 ${isHovering ? 'gap-2' : 'gap-[-2rem] translate-y-32'}`}>
+            <div className={cn('relative flex items-end justify-center transition-all duration-500 px-4 pb-8', isHovering ? 'gap-2' : 'gap-[-2rem] translate-y-32')}>
                 {CARDS.map((val, index) => {
                     const isSelected = currentUser.vote === val;
                     const total = CARDS.length;
@@ -46,20 +47,20 @@ export const VotingCards: React.FC = () => {
                                 zIndex: isSelected ? 50 : index,
                                 marginLeft: isHovering ? 0 : '-1.5rem'
                             }}
-                            className={`
-                                relative w-24 h-40 rounded-xl border-2 shadow-2xl transition-all duration-500 ease-out origin-bottom
-                                flex items-center justify-center text-4xl font-bold group bg-ink-800
-                                ${isSelected
+                            className={cn(
+                                'relative w-24 h-40 rounded-xl border-2 shadow-2xl transition-all duration-500 ease-out origin-bottom',
+                                'flex items-center justify-center text-4xl font-bold group bg-ink-800',
+                                isSelected
                                     ? 'bg-white border-accent text-accent scale-110'
-                                    : 'border-ink-600 text-ink-300 hover:bg-ink-700 hover:-translate-y-10 hover:scale-110 hover:z-40 hover:border-ink-400'}
-                            `}
+                                    : 'border-ink-600 text-ink-300 hover:bg-ink-700 hover:-translate-y-10 hover:scale-110 hover:z-40 hover:border-ink-400'
+                            )}
                         >
                             <div className="absolute inset-2 border border-dashed border-current opacity-20 rounded-lg pointer-events-none" />
 
                             <span className="absolute top-2 left-2 text-sm font-bold opacity-60">{val}</span>
                             <span className="absolute bottom-2 right-2 text-sm font-bold opacity-60 rotate-180">{val}</span>
 
-                            <span className={`transform group-hover:scale-110 transition-all duration-300 ${!isHovering && !isSelected ? 'opacity-0' : 'opacity-100'}`}>
+                            <span className={cn('transform group-hover:scale-110 transition-all duration-300', !isHovering && !isSelected ? 'opacity-0' : 'opacity-100')}>
                                 {val === '?' ? '🃏' : val}
                             </span>
                         </button>

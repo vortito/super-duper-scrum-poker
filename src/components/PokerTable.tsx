@@ -3,6 +3,7 @@ import { useSession } from '../context/SessionContext';
 import { useLanguage } from '../context/LanguageContext';
 import { VotingCards } from './VotingCards';
 import { Copy, RotateCcw, Eye, LogOut } from 'lucide-react';
+import { cn } from '../utils/cn';
 
 export const PokerTable: React.FC = () => {
     const { session, currentUser, revealVotes, resetSession, leaveSession } = useSession();
@@ -199,7 +200,7 @@ export const PokerTable: React.FC = () => {
                                 >
                                     <div className="relative w-full h-full">
                                         <div
-                                            className={`w-full h-full rounded-lg shadow-xl transition-all duration-300 ${player.vote !== null ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+                                            className={cn('w-full h-full rounded-lg shadow-xl transition-all duration-300', player.vote !== null ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0')}
                                         >
                                             {!session.revealed ? (
                                                 <div className="absolute inset-0 bg-gradient-to-br from-accent to-accent-deep rounded-lg border-2 border-accent/30 flex items-center justify-center shadow-md">
@@ -226,15 +227,15 @@ export const PokerTable: React.FC = () => {
                                     }}
                                 >
                                     <div
-                                        className={`flex flex-col items-center gap-1 transition-all duration-300 ${player.vote !== null && !session.revealed ? 'opacity-100' : 'opacity-80'}`}
+                                        className={cn('flex flex-col items-center gap-1 transition-all duration-300', player.vote !== null && !session.revealed ? 'opacity-100' : 'opacity-80')}
                                     >
                                         <div
-                                            className={`
-                                                rounded-full flex items-center justify-center font-bold border-2 shadow-lg z-20 relative
-                                                ${isMe
+                                            className={cn(
+                                                'rounded-full flex items-center justify-center font-bold border-2 shadow-lg z-20 relative',
+                                                isMe
                                                     ? 'bg-accent border-accent-soft text-white'
-                                                    : 'bg-ink-700 border-ink-600 text-ink-300'}
-                                            `}
+                                                    : 'bg-ink-700 border-ink-600 text-ink-300'
+                                            )}
                                             style={{
                                                 width: `${avatarSize}px`,
                                                 height: `${avatarSize}px`,
@@ -244,7 +245,7 @@ export const PokerTable: React.FC = () => {
                                             {player.name.charAt(0).toUpperCase()}
                                         </div>
                                         <span
-                                            className={`font-medium px-2 py-0.5 rounded-full bg-ink-900/80 backdrop-blur border border-white/10 whitespace-nowrap ${isMe ? 'text-accent-soft' : 'text-ink-400'}`}
+                                            className={cn('font-medium px-2 py-0.5 rounded-full bg-ink-900/80 backdrop-blur border border-white/10 whitespace-nowrap', isMe ? 'text-accent-soft' : 'text-ink-400')}
                                             style={{ fontSize: `${Math.max(0.75, 0.75 * scale * 1.2)}rem` }}
                                         >
                                             {player.name}
