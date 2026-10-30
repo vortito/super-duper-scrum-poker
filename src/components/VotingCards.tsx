@@ -25,7 +25,7 @@ export const VotingCards: React.FC = () => {
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
         >
-            <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/80 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-app-bg via-app-bg/80 to-transparent pointer-events-none" />
 
             <div className={cn('relative flex items-end justify-center transition-all duration-500 px-4 pb-8', isHovering ? 'gap-2' : 'gap-[-2rem] translate-y-32')}>
                 {CARDS.map((val, index) => {

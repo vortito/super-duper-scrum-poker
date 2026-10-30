@@ -1,9 +1,13 @@
 import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { useSession } from '../context/SessionContext';
 import { useLanguage } from '../context/LanguageContext';
+import { ACCENTS } from '../context/ThemeContext';
+import type { AccentName } from '../context/ThemeContext';
 import { VotingCards } from './VotingCards';
 import { Copy, RotateCcw, Eye, LogOut } from 'lucide-react';
 import { cn } from '../utils/cn';
+
+const resolveAccent = (accent: string) => ACCENTS[accent as AccentName]?.accent ?? accent;
 
 export const PokerTable: React.FC = () => {
     const { session, currentUser, revealVotes, resetSession, leaveSession } = useSession();
@@ -82,11 +86,11 @@ export const PokerTable: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-ink-950 text-white overflow-hidden flex flex-col relative selection:bg-accent/30">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-accent-deep/20 via-ink-950 to-ink-950 pointer-events-none" />
+        <div className="min-h-screen bg-app-bg text-app-text overflow-hidden flex flex-col relative selection:bg-accent/30">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-accent-deep/20 via-app-bg to-app-bg pointer-events-none" />
 
             <header className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-40 pointer-events-none">
-                <div className="pointer-events-auto flex items-center gap-4 bg-ink-900/50 backdrop-blur-md p-2 pr-4 rounded-full border border-white/5">
+                <div className="pointer-events-auto flex items-center gap-4 bg-app-surface backdrop-blur-md p-2 pr-4 rounded-full border border-white/5">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-accent-secondary flex items-center justify-center font-bold text-lg shadow-lg">
                         SP
                     </div>
@@ -100,7 +104,7 @@ export const PokerTable: React.FC = () => {
                             <button
                                 data-testid="copy-link-button"
                                 onClick={copyLink}
-                                className="hover:text-white transition-colors"
+                                className="hover:text-app-text transition-colors"
                                 title={t('game.copy')}
                             >
                                 <Copy size={12} />
@@ -137,13 +141,13 @@ export const PokerTable: React.FC = () => {
                                             {t('game.deal')}
                                         </h2>
                                         <div className="text-xl text-ink-400 font-medium">
-                                            {t('game.agreed')} <span data-testid="consensus-value" className="text-white font-bold text-2xl">{consensus}</span>
+                                            {t('game.agreed')} <span data-testid="consensus-value" className="text-app-text font-bold text-2xl">{consensus}</span>
                                         </div>
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center">
                                         <span className="text-ink-500 text-xs uppercase tracking-widest mb-1">{t('game.average')}</span>
-                                        <span data-testid="average-value" className="text-6xl font-bold text-white drop-shadow-lg">
+                                        <span data-testid="average-value" className="text-6xl font-bold text-app-text drop-shadow-lg">
                                             {session.average}
                                         </span>
                                     </div>
@@ -181,6 +185,7 @@ export const PokerTable: React.FC = () => {
                     {sortedPlayers.map((player, index) => {
                         const { cardX, cardY, playerX, playerY, scale, rotationDeg } = getPositions(index, sortedPlayers.length);
                         const isMe = currentUser?.id === player.id;
+                        const avatarAccent = isMe || !player.theme ? undefined : resolveAccent(player.theme.accent);
 
                         const avatarSize = Math.max(40, 60 * scale);
                         const cardWidth = Math.max(56, 56 * scale);
@@ -230,22 +235,25 @@ export const PokerTable: React.FC = () => {
                                         className={cn('flex flex-col items-center gap-1 transition-all duration-300', player.vote !== null && !session.revealed ? 'opacity-100' : 'opacity-80')}
                                     >
                                         <div
+                                            data-testid={`avatar-${player.name}`}
                                             className={cn(
                                                 'rounded-full flex items-center justify-center font-bold border-2 shadow-lg z-20 relative',
                                                 isMe
                                                     ? 'bg-accent border-accent-soft text-white'
-                                                    : 'bg-ink-700 border-ink-600 text-ink-300'
+                                                    : 'bg-ink-700 border-ink-600',
+                                                !avatarAccent && !isMe && 'text-ink-300'
                                             )}
                                             style={{
                                                 width: `${avatarSize}px`,
                                                 height: `${avatarSize}px`,
-                                                fontSize: `${Math.max(0.875, 0.875 * scale * 1.5)}rem`
+                                                fontSize: `${Math.max(0.875, 0.875 * scale * 1.5)}rem`,
+                                                color: avatarAccent
                                             }}
                                         >
                                             {player.name.charAt(0).toUpperCase()}
                                         </div>
                                         <span
-                                            className={cn('font-medium px-2 py-0.5 rounded-full bg-ink-900/80 backdrop-blur border border-white/10 whitespace-nowrap', isMe ? 'text-accent-soft' : 'text-ink-400')}
+                                            className={cn('font-medium px-2 py-0.5 rounded-full bg-app-surface/80 backdrop-blur border border-white/10 whitespace-nowrap', isMe ? 'text-accent-soft' : 'text-ink-400')}
                                             style={{ fontSize: `${Math.max(0.75, 0.75 * scale * 1.2)}rem` }}
                                         >
                                             {player.name}

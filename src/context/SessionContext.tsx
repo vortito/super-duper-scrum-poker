@@ -12,8 +12,9 @@ import {
 } from 'firebase/firestore';
 import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 import { db, auth } from '../services/firebase';
-import { Session, Player, Vote, SessionContextType } from '../types';
+import { Session, Player, Vote, SessionContextType, PlayerTheme } from '../types';
 import { useLanguage } from './LanguageContext';
+import { useTheme } from './ThemeContext';
 
 const SESSION_ID_KEY = 'scrum_poker_session_id';
 const USER_ID_KEY = 'scrum_poker_user_id';
@@ -52,6 +53,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     const [error, setError] = useState<string | null>(null);
     const unsubscribeRef = useRef<(() => void) | null>(null);
     const { t } = useLanguage();
+    const { theme } = useTheme();
 
     const stopSubscription = () => {
         unsubscribeRef.current?.();
@@ -141,7 +143,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
             const userId = await ensureSignedIn();
             const sessionId = Math.random().toString(36).substring(2, 8).toUpperCase();
 
-            const newPlayer: Player = { id: userId, name: playerName, vote: null };
+            const newPlayer: Player = { id: userId, name: playerName, vote: null, theme };
             const newSession: Session = {
                 id: sessionId,
                 revealed: false,
@@ -181,7 +183,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
 
             const sessionData = sessionSnap.data() as Session;
             const existingPlayer = sessionData.players.find((p) => p.id === userId);
-            const player: Player = existingPlayer ?? { id: userId, name: playerName, vote: null };
+            const player: Player = existingPlayer ?? { id: userId, name: playerName, vote: null, theme };
 
             if (!existingPlayer) {
                 await updateDoc(sessionRef, {
@@ -218,6 +220,16 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
         if (!session || !currentUser) return;
 
         const updatedPlayers = session.players.map((p) => (p.id === currentUser.id ? { ...p, vote } : p));
+
+        await updateDoc(doc(db, 'sessions', session.id), {
+            players: updatedPlayers
+        });
+    };
+
+    const setPlayerTheme = async (playerTheme: PlayerTheme) => {
+        if (!session || !currentUser) return;
+
+        const updatedPlayers = session.players.map((p) => (p.id === currentUser.id ? { ...p, theme: playerTheme } : p));
 
         await updateDoc(doc(db, 'sessions', session.id), {
             players: updatedPlayers
@@ -269,6 +281,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
             joinSession,
             checkSessionExists,
             submitVote,
+            setPlayerTheme,
             revealVotes,
             resetSession,
             leaveSession

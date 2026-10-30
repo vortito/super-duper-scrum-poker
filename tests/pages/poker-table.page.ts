@@ -1,4 +1,14 @@
 import { Page, Locator, expect } from '@playwright/test';
+import { ACCENTS } from '../../src/context/ThemeContext';
+import type { AccentName } from '../../src/context/ThemeContext';
+
+/** Convert a hex color like "#10b981" to the CSS computed-style format "rgb(16, 185, 129)". */
+function accentRgb(hex: string): string {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgb(${r}, ${g}, ${b})`;
+}
 
 export class PokerTablePage {
     readonly voteCounter: Locator;
@@ -28,6 +38,11 @@ export class PokerTablePage {
     private votingCard(value: string): Locator {
         const escaped = value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         return this.page.getByRole('button', { name: new RegExp(`^${escaped}(\\s+${escaped})*$`) });
+    }
+
+    private avatar(playerName: string): Locator {
+        const escaped = playerName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return this.page.getByTestId(`avatar-${escaped}`);
     }
 
     async waitForEntry(): Promise<void> {
@@ -89,6 +104,17 @@ export class PokerTablePage {
 
     async expectConsensus(value: string): Promise<void> {
         await expect(this.consensusValue).toHaveText(value, { timeout: 5000 });
+    }
+
+    async expectAvatarAccent(playerName: string, accent: AccentName): Promise<void> {
+        const accentHex = ACCENTS[accent].accent;
+        await expect(this.avatar(playerName)).toBeVisible({ timeout: 10000 });
+        await expect
+            .poll(() => this.page.evaluate((name) => {
+                const el = document.querySelector(`[data-testid="avatar-${name}"]`) as HTMLElement | null;
+                return el ? getComputedStyle(el).color : '';
+            }, playerName))
+            .toBe(accentRgb(accentHex));
     }
 
     async copyLink(): Promise<void> {
