@@ -8,14 +8,14 @@ export const LanguageSelector: React.FC = () => {
     const { language, setLanguage } = useLanguage();
 
     return (
-        <div className="flex items-center gap-2 bg-ink-900/50 backdrop-blur-md p-1 rounded-lg border border-white/10">
+        <div className="flex items-center gap-2 bg-app-surface backdrop-blur-md p-1 rounded-lg border border-white/10">
             <Globe size={16} className="text-ink-400 ml-2" />
             <div className="flex">
                 {LANGUAGES.map((lang) => (
                     <button
                         key={lang}
                         onClick={() => setLanguage(lang)}
-                        className={cn('px-2 py-1 rounded-md text-xs font-bold uppercase transition-all', language === lang ? 'bg-accent text-white shadow-sm' : 'text-ink-400 hover:text-white hover:bg-white/5')}
+                        className={cn('px-2 py-1 rounded-md text-xs font-bold uppercase transition-all', language === lang ? 'bg-accent text-white shadow-sm' : 'text-ink-400 hover:text-app-text hover:bg-white/5')}
                     >
                         {lang}
                     </button>

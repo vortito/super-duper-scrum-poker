@@ -53,15 +53,15 @@ export const WelcomeScreen: React.FC = () => {
                     <p className="text-ink-400" data-testid="welcome-subtitle">{t('welcome.subtitle')}</p>
                 </div>
 
-                <div className="flex gap-2 mb-6 p-1 bg-ink-900/50 rounded-lg border border-white/5">
+                <div className="flex gap-2 mb-6 p-1 bg-app-surface rounded-lg border border-white/5">
                     <button
-                        className={cn('flex-1 py-2 rounded-md text-sm font-medium transition-all duration-300', mode === 'create' ? 'bg-accent text-white shadow-lg shadow-accent/20 ring-1 ring-accent-soft/50' : 'text-ink-400 hover:text-white hover:bg-white/5')}
+                        className={cn('flex-1 py-2 rounded-md text-sm font-medium transition-all duration-300', mode === 'create' ? 'bg-accent text-white shadow-lg shadow-accent/20 ring-1 ring-accent-soft/50' : 'text-ink-400 hover:text-app-text hover:bg-white/5')}
                         onClick={() => setMode('create')}
                     >
                         {t('welcome.create')}
                     </button>
                     <button
-                        className={cn('flex-1 py-2 rounded-md text-sm font-medium transition-all duration-300', mode === 'join' ? 'bg-accent text-white shadow-lg shadow-accent/20 ring-1 ring-accent-soft/50' : 'text-ink-400 hover:text-white hover:bg-white/5')}
+                        className={cn('flex-1 py-2 rounded-md text-sm font-medium transition-all duration-300', mode === 'join' ? 'bg-accent text-white shadow-lg shadow-accent/20 ring-1 ring-accent-soft/50' : 'text-ink-400 hover:text-app-text hover:bg-white/5')}
                         onClick={() => setMode('join')}
                     >
                         {t('welcome.join')}
@@ -74,7 +74,7 @@ export const WelcomeScreen: React.FC = () => {
                         <input
                             type="text"
                             data-testid="name-input"
-                            className="w-full bg-ink-900/50 border border-ink-700 rounded-xl px-4 py-3 text-white placeholder:text-ink-500 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all shadow-sm"
+                            className="w-full bg-app-surface border border-ink-700 rounded-xl px-4 py-3 text-app-text placeholder:text-ink-500 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all shadow-sm"
                             placeholder={t('welcome.namePlaceholder')}
                             value={name}
                             onChange={(e) => setName(e.target.value)}
@@ -88,7 +88,7 @@ export const WelcomeScreen: React.FC = () => {
                             <input
                                 type="text"
                                 data-testid="room-id-input"
-                                className="w-full bg-ink-900/50 border border-ink-700 rounded-xl px-4 py-3 text-white placeholder:text-ink-500 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all shadow-sm uppercase tracking-wider font-mono"
+                                className="w-full bg-app-surface border border-ink-700 rounded-xl px-4 py-3 text-app-text placeholder:text-ink-500 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all shadow-sm uppercase tracking-wider font-mono"
                                 placeholder={t('welcome.sessionPlaceholder')}
                                 value={sessionId}
                                 onChange={(e) => setSessionId(e.target.value.toUpperCase())}

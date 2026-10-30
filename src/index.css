@@ -1,6 +1,10 @@
 @import "tailwindcss";
 
 @theme {
+  --color-app-bg: #020617;
+  --color-app-surface: #0f172a;
+  --color-app-text: #f8fafc;
+
   --color-accent: #6366f1;
   --color-accent-soft: #818cf8;
   --color-accent-deep: #3730a3;
@@ -32,7 +36,8 @@ body {
   margin: 0;
   width: 100%;
   min-height: 100vh;
-  background-color: var(--color-ink-950);
+  background-color: var(--color-app-bg);
+  color: var(--color-app-text);
   overflow-x: hidden;
 }
 

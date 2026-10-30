@@ -4,10 +4,18 @@ export type Vote = number | '?' | null;
 
 export type Language = 'es' | 'en' | 'fr';
 
+export type ThemeMode = 'dark' | 'light';
+
+export interface PlayerTheme {
+    mode: ThemeMode;
+    accent: string;
+}
+
 export interface Player {
     id: string;
     name: string;
     vote: Vote;
+    theme?: PlayerTheme;
 }
 
 export interface Session {
@@ -27,6 +35,7 @@ export interface SessionContextType {
     joinSession: (sessionId: string, playerName: string) => Promise<void>;
     checkSessionExists: (sessionId: string) => Promise<void>;
     submitVote: (vote: Vote) => Promise<void>;
+    setPlayerTheme: (theme: PlayerTheme) => Promise<void>;
     revealVotes: () => Promise<void>;
     resetSession: () => Promise<void>;
     leaveSession: () => void;

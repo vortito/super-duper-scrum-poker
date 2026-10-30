@@ -29,8 +29,8 @@ const AppContent: React.FC = () => {
 
 export const App: React.FC = () => {
     return (
-        <ThemeProvider>
-            <LanguageProvider>
+        <LanguageProvider>
+            <ThemeProvider>
                 <SessionProvider>
                     <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
                         <ThemeSelector />
@@ -38,7 +38,7 @@ export const App: React.FC = () => {
                     </div>
                     <AppContent />
                 </SessionProvider>
-            </LanguageProvider>
-        </ThemeProvider>
+            </ThemeProvider>
+        </LanguageProvider>
     );
 };
