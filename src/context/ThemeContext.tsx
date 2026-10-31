@@ -18,6 +18,8 @@ type SurfacePalette = {
     text: string;
 };
 
+type InkPalette = Record<'200' | '300' | '400' | '500' | '600' | '700' | '800' | '900' | '950', string>;
+
 type ThemeSelection = {
     mode: ThemeMode;
     accent: AccentName;
@@ -35,8 +37,33 @@ export const ACCENTS: Record<AccentName, AccentVars> = {
 export const THEME_ORDER: AccentName[] = ['blue', 'green', 'pink', 'orange', 'cyan', 'slate'];
 
 export const SURFACE_PALETTES: Record<ThemeMode, SurfacePalette> = {
-    dark: { bg: '#020617', surface: '#0f172a', text: '#f8fafc' },
-    light: { bg: '#f1f5f9', surface: '#ffffff', text: '#0f172a' },
+    dark: { bg: '#0c0a09', surface: '#1c1917', text: '#f8fafc' },
+    light: { bg: '#e2e8f0', surface: '#ffffff', text: '#0f172a' },
+};
+
+export const INK_PALETTES: Record<ThemeMode, InkPalette> = {
+    dark: {
+        '200': '#e7e5e4',
+        '300': '#d6d3d1',
+        '400': '#a8a29e',
+        '500': '#78716c',
+        '600': '#57534e',
+        '700': '#44403c',
+        '800': '#292020',
+        '900': '#1c1917',
+        '950': '#0c0a09',
+    },
+    light: {
+        '200': '#0f172a',
+        '300': '#1e293b',
+        '400': '#475569',
+        '500': '#334155',
+        '600': '#1e293b',
+        '700': '#334155',
+        '800': '#e2e8f0',
+        '900': '#0f172a',
+        '950': '#e2e8f0',
+    },
 };
 
 const MODE_STORAGE_KEY = 'scrum_poker_theme_mode';
@@ -71,14 +98,21 @@ const readStoredAccent = (): AccentName => {
     return isAccentName(stored) ? stored : DEFAULT_ACCENT;
 };
 
+const INK_SHADES = ['200', '300', '400', '500', '600', '700', '800', '900', '950'] as const;
+
 const applyTheme = (mode: ThemeMode, accent: AccentName) => {
     const surface = SURFACE_PALETTES[mode];
+    const ink = INK_PALETTES[mode];
     const accentVars = ACCENTS[accent];
     const root = document.documentElement;
 
     root.style.setProperty('--color-app-bg', surface.bg);
     root.style.setProperty('--color-app-surface', surface.surface);
     root.style.setProperty('--color-app-text', surface.text);
+    for (const shade of INK_SHADES) {
+        root.style.setProperty(`--color-ink-${shade}`, ink[shade]);
+    }
+    root.style.setProperty('color-scheme', mode);
     root.style.setProperty('--color-accent', accentVars.accent);
     root.style.setProperty('--color-accent-soft', accentVars.soft);
     root.style.setProperty('--color-accent-deep', accentVars.deep);

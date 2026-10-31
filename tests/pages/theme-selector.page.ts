@@ -1,11 +1,14 @@
 import { Page, Locator, expect } from '@playwright/test';
-import { ACCENTS, SURFACE_PALETTES } from '../../src/context/ThemeContext';
+import { ACCENTS, SURFACE_PALETTES, INK_PALETTES } from '../../src/context/ThemeContext';
 import type { AccentName, ThemeMode } from '../../src/context/ThemeContext';
+import { SettingsMenuPage } from './settings-menu.page';
 
 const MODE_LABELS: Record<ThemeMode, string> = { dark: 'Dark mode', light: 'Light mode' };
 
 export class ThemeSelectorPage {
     constructor(private readonly page: Page) {}
+
+    private readonly settings = new SettingsMenuPage(page);
 
     private swatch(name: AccentName): Locator {
         return this.page.getByRole('button', { name, exact: true });
@@ -25,20 +28,33 @@ export class ThemeSelectorPage {
     }
 
     async select(name: AccentName): Promise<void> {
+        await this.settings.open();
         await this.swatch(name).click();
     }
 
     async setMode(mode: ThemeMode): Promise<void> {
+        await this.settings.open();
         await this.modeToggle(mode).click();
     }
 
     async expectActive(name: AccentName): Promise<void> {
+        await this.settings.open();
         await expect(this.swatch(name)).toHaveAttribute('aria-pressed', 'true');
     }
 
     async expectMode(mode: ThemeMode): Promise<void> {
+        await this.settings.open();
         await expect(this.modeToggle(mode)).toHaveAttribute('aria-pressed', 'true');
         await this.expectPaletteApplied(mode, await this.activeAccent());
+    }
+
+    async expectInkScale(mode: ThemeMode): Promise<void> {
+        const palette = INK_PALETTES[mode];
+        for (const [shade, value] of Object.entries(palette)) {
+            await expect
+                .poll(() => this.page.evaluate((name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim(), `--color-ink-${shade}`))
+                .toBe(value);
+        }
     }
 
     async expectAccentApplied(name: AccentName): Promise<void> {

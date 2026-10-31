@@ -41,3 +41,16 @@ Feature: Theme Selection
   Scenario: The default mode is dark with the blue accent on first visit
     Then "Alex" sees the "dark" mode active
     Then "Alex" sees the "blue" accent active
+
+  Scenario: Light mode applies the light ink scale to the felt and cards
+    When "Alex" switches to the "light" mode
+    Then "Alex" sees the "light" ink scale applied
+
+  Scenario: Dark mode applies the warm ink scale to the felt and cards
+    Then "Alex" sees the "dark" ink scale applied
+
+  Scenario: The settings menu opens and closes
+    When "Alex" opens the settings menu
+    Then "Alex" sees the settings menu open
+    When "Alex" presses the escape key
+    Then "Alex" sees the settings menu closed

@@ -28,6 +28,11 @@ const es = {
         newRound: 'Nueva Ronda',
         copy: 'Copiar enlace'
     },
+    settings: {
+        label: 'Ajustes',
+        theme: 'Tema',
+        language: 'Idioma'
+    },
     errors: {
         sessionNotFound: 'La sala no existe',
         sessionExpired: 'La sala ha expirado'
@@ -62,6 +67,11 @@ export const translations: Record<Language, typeof es> = {
             newRound: 'New Round',
             copy: 'Copy Link'
         },
+        settings: {
+            label: 'Settings',
+            theme: 'Theme',
+            language: 'Language'
+        },
         errors: {
             sessionNotFound: 'Room not found',
             sessionExpired: 'Room has expired'
@@ -92,6 +102,11 @@ export const translations: Record<Language, typeof es> = {
             reveal: 'Révéler les Cartes',
             newRound: 'Nouvelle Manche',
             copy: 'Copier le lien'
+        },
+        settings: {
+            label: 'Paramètres',
+            theme: 'Thème',
+            language: 'Langue'
         },
         errors: {
             sessionNotFound: 'La salle n\'existe pas',
