@@ -4,8 +4,7 @@ import { WelcomeScreen } from './components/WelcomeScreen';
 import { PokerTable } from './components/PokerTable';
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
-import { LanguageSelector } from './components/LanguageSelector';
-import { ThemeSelector } from './components/ThemeSelector';
+import { SettingsMenu } from './components/SettingsMenu';
 import { homeUrl, roomUrl } from './utils/url';
 
 const AppContent: React.FC = () => {
@@ -32,9 +31,8 @@ export const App: React.FC = () => {
         <LanguageProvider>
             <ThemeProvider>
                 <SessionProvider>
-                    <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
-                        <ThemeSelector />
-                        <LanguageSelector />
+                    <div className="absolute top-4 right-4 z-50">
+                        <SettingsMenu />
                     </div>
                     <AppContent />
                 </SessionProvider>

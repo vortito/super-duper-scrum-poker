@@ -1,5 +1,6 @@
 import { Given, When, Then } from './fixtures';
 import { ThemeSelectorPage } from '../pages/theme-selector.page';
+import { SettingsMenuPage } from '../pages/settings-menu.page';
 import { WelcomePage } from '../pages/welcome.page';
 import type { AccentName, ThemeMode } from '../../src/context/ThemeContext';
 
@@ -37,4 +38,24 @@ Then('{string} sees the {string} mode active', async ({ world }, playerName: str
 
 Then('{string} sees the {string} accent active', async ({ world }, playerName: string, accentName: string) => {
     await new ThemeSelectorPage(world.getPlayer(playerName)).expectAccentApplied(accentName as AccentName);
+});
+
+Then('{string} sees the {string} ink scale applied', async ({ world }, playerName: string, modeName: string) => {
+    await new ThemeSelectorPage(world.getPlayer(playerName)).expectInkScale(MODES[modeName]);
+});
+
+When('{string} opens the settings menu', async ({ world }, playerName: string) => {
+    await new SettingsMenuPage(world.getPlayer(playerName)).open();
+});
+
+Then('{string} sees the settings menu open', async ({ world }, playerName: string) => {
+    await new SettingsMenuPage(world.getPlayer(playerName)).expectOpen();
+});
+
+When('{string} presses the escape key', async ({ world }, playerName: string) => {
+    await world.getPlayer(playerName).keyboard.press('Escape');
+});
+
+Then('{string} sees the settings menu closed', async ({ world }, playerName: string) => {
+    await new SettingsMenuPage(world.getPlayer(playerName)).expectClosed();
 });
