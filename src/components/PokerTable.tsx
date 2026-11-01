@@ -7,7 +7,7 @@ import { VotingCards } from './VotingCards';
 import { Copy, RotateCcw, Eye, LogOut } from 'lucide-react';
 import { cn } from '../utils/cn';
 
-const resolveAccent = (accent: string) => ACCENTS[accent as AccentName]?.accent ?? accent;
+const resolveAccentVars = (accent: string) => ACCENTS[accent as AccentName];
 
 export const PokerTable: React.FC = () => {
     const { session, currentUser, revealVotes, resetSession, leaveSession } = useSession();
@@ -60,6 +60,8 @@ export const PokerTable: React.FC = () => {
     }, [session, currentUser]);
 
     if (!session) return null;
+
+    const allPlayersHaveVoted = session.players.length > 0 && session.players.every((p) => p.vote !== null);
 
     const copyLink = () => {
         navigator.clipboard.writeText(window.location.href);
@@ -127,7 +129,7 @@ export const PokerTable: React.FC = () => {
                     ref={tableRef}
                     className="relative w-[60%] max-w-[900px] aspect-[2/1] flex items-center justify-center z-0"
                 >
-                    <div className="absolute inset-0 bg-ink-800/80 rounded-[300px] border-8 border-ink-700 shadow-[0_0_50px_rgba(0,0,0,0.5)] backdrop-blur-sm transform transition-all duration-1000">
+                    <div className="absolute inset-0 bg-ink-800/80 rounded-[300px] border-8 border-(--color-felt-border) shadow-[0_0_50px_rgba(0,0,0,0.5)] backdrop-blur-sm transform transition-all duration-1000">
                         <div className="absolute inset-2 rounded-[290px] bg-ink-800 border border-white/5 shadow-inner" />
                     </div>
 
@@ -164,13 +166,15 @@ export const PokerTable: React.FC = () => {
                             </div>
                         ) : (
                             <div className="flex flex-col items-center gap-4">
-                                <div data-testid="vote-count" className="text-ink-500 font-medium tracking-wide">
+                                <div data-testid="vote-count" className="text-ink-300 font-medium tracking-wide">
                                     {session.players.filter((p) => p.vote !== null).length} / {session.players.length} {t('game.votes')}
                                 </div>
                                 <button
                                     data-testid="reveal-button"
                                     onClick={() => revealVotes()}
-                                    className="group relative px-8 py-4 bg-accent hover:brightness-110 rounded-full text-white font-bold shadow-lg shadow-accent/25 transition-all hover:scale-105 active:scale-95"
+                                    disabled={!allPlayersHaveVoted}
+                                    title={allPlayersHaveVoted ? undefined : t('game.revealLocked')}
+                                    className="group relative px-8 py-4 bg-accent hover:brightness-110 rounded-full text-white font-bold shadow-lg shadow-accent/25 transition-all hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
                                 >
                                     <span className="flex items-center gap-2">
                                         <Eye size={20} /> {t('game.reveal')}
@@ -185,7 +189,7 @@ export const PokerTable: React.FC = () => {
                     {sortedPlayers.map((player, index) => {
                         const { cardX, cardY, playerX, playerY, scale, rotationDeg } = getPositions(index, sortedPlayers.length);
                         const isMe = currentUser?.id === player.id;
-                        const avatarAccent = isMe || !player.theme ? undefined : resolveAccent(player.theme.accent);
+                        const playerAccentVars = !isMe && player.theme ? resolveAccentVars(player.theme.accent) : undefined;
 
                         const avatarSize = Math.max(40, 60 * scale);
                         const cardWidth = Math.max(56, 56 * scale);
@@ -240,14 +244,18 @@ export const PokerTable: React.FC = () => {
                                                 'rounded-full flex items-center justify-center font-bold border-2 shadow-lg z-20 relative',
                                                 isMe
                                                     ? 'bg-accent border-accent-soft text-white'
-                                                    : 'bg-ink-700 border-ink-600',
-                                                !avatarAccent && !isMe && 'text-ink-300'
+                                                    : playerAccentVars
+                                                        ? 'text-white'
+                                                        : 'bg-ink-700 border-ink-600 text-ink-300'
                                             )}
                                             style={{
                                                 width: `${avatarSize}px`,
                                                 height: `${avatarSize}px`,
                                                 fontSize: `${Math.max(0.875, 0.875 * scale * 1.5)}rem`,
-                                                color: avatarAccent
+                                                ...(playerAccentVars && {
+                                                    backgroundColor: playerAccentVars.accent,
+                                                    borderColor: playerAccentVars.soft
+                                                })
                                             }}
                                         >
                                             {player.name.charAt(0).toUpperCase()}

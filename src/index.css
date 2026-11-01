@@ -20,9 +20,11 @@
   --color-ink-500: #78716c;
   --color-ink-600: #57534e;
   --color-ink-700: #44403c;
-  --color-ink-800: #292020;
+  --color-ink-800: #292524;
   --color-ink-900: #1c1917;
   --color-ink-950: #0c0a09;
+
+  --color-felt-border: #403a35;
 }
 
 :root {

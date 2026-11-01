@@ -8,7 +8,8 @@ import {
     arrayUnion,
     serverTimestamp,
     Timestamp,
-    deleteDoc
+    deleteDoc,
+    runTransaction
 } from 'firebase/firestore';
 import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 import { db, auth } from '../services/firebase';
@@ -40,6 +41,14 @@ const getCreatedMillis = (createdAt: Session['createdAt'], now: number): number 
     if (typeof createdAt === 'number') return createdAt;
     if (createdAt instanceof Timestamp) return createdAt.toMillis();
     return now;
+};
+
+const computeAverage = (votes: Vote[]): number | null => {
+    const validVotes = votes.filter((v): v is number => typeof v === 'number');
+    if (validVotes.length === 0) {
+        return null;
+    }
+    return Number((validVotes.reduce((a, b) => a + b, 0) / validVotes.length).toFixed(1));
 };
 
 interface SessionProviderProps {
@@ -219,36 +228,45 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     const submitVote = async (vote: Vote) => {
         if (!session || !currentUser) return;
 
-        const updatedPlayers = session.players.map((p) => (p.id === currentUser.id ? { ...p, vote } : p));
-
-        await updateDoc(doc(db, 'sessions', session.id), {
-            players: updatedPlayers
+        const sessionRef = doc(db, 'sessions', session.id);
+        await runTransaction(db, async (transaction) => {
+            const snapshot = await transaction.get(sessionRef);
+            const data = snapshot.data() as Session;
+            transaction.update(sessionRef, {
+                players: data.players.map((p) => {
+                    if (p.id === currentUser.id) {
+                        return { ...p, vote };
+                    }
+                    return p.vote !== null ? p : { ...p, vote: currentUser.vote };
+                })
+            });
         });
     };
 
     const setPlayerTheme = async (playerTheme: PlayerTheme) => {
         if (!session || !currentUser) return;
 
-        const updatedPlayers = session.players.map((p) => (p.id === currentUser.id ? { ...p, theme: playerTheme } : p));
-
-        await updateDoc(doc(db, 'sessions', session.id), {
-            players: updatedPlayers
+        const sessionRef = doc(db, 'sessions', session.id);
+        await runTransaction(db, async (transaction) => {
+            const snapshot = await transaction.get(sessionRef);
+            const data = snapshot.data() as Session;
+            transaction.update(sessionRef, {
+                players: data.players.map((p) => (p.id === currentUser.id ? { ...p, theme: playerTheme } : p))
+            });
         });
     };
 
     const revealVotes = async () => {
         if (!session) return;
 
-        const validVotes = session.players
-            .map((p) => p.vote)
-            .filter((v): v is number => typeof v === 'number');
-        const average = validVotes.length > 0
-            ? Number((validVotes.reduce((a, b) => a + b, 0) / validVotes.length).toFixed(1))
-            : null;
-
-        await updateDoc(doc(db, 'sessions', session.id), {
-            revealed: true,
-            average
+        const sessionRef = doc(db, 'sessions', session.id);
+        await runTransaction(db, async (transaction) => {
+            const snapshot = await transaction.get(sessionRef);
+            const data = snapshot.data() as Session;
+            transaction.update(sessionRef, {
+                revealed: true,
+                average: computeAverage(data.players.map((p) => p.vote))
+            });
         });
     };
 

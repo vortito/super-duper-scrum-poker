@@ -66,4 +66,4 @@ Forbidden (fragile): CSS classes, CSS variables, placeholders, `title` attribute
 - Multiplayer steps use the `world` fixture in `tests/steps/fixtures.ts`: `world.createPlayer('Alice')` returns a page in a fresh, isolated `BrowserContext` per player.
 
 ## Flakiness
-`submitVote`/`resetSession` in `src/context/SessionContext.tsx` write the entire `players` array back from local snapshot state, so two clients writing before the other's snapshot arrives can clobber each other's votes. Keep vote-related assertions tolerant of snapshot lag.
+`submitVote`, `setPlayerTheme` and `revealVotes` in `src/context/SessionContext.tsx` run as Firestore transactions, so concurrent writers (e.g. two players voting at once) retry instead of clobbering each other's data. The average is computed from the document inside the `revealVotes` transaction, so it is correct even if the revealing client's local snapshot hasn't synced the other votes yet. In-flight (not yet committed) writes can still be invisible to a concurrent read — keep vote-related assertions tolerant of snapshot lag.

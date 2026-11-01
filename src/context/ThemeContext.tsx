@@ -38,7 +38,7 @@ export const THEME_ORDER: AccentName[] = ['blue', 'green', 'pink', 'orange', 'cy
 
 export const SURFACE_PALETTES: Record<ThemeMode, SurfacePalette> = {
     dark: { bg: '#0c0a09', surface: '#1c1917', text: '#f8fafc' },
-    light: { bg: '#e2e8f0', surface: '#ffffff', text: '#0f172a' },
+    light: { bg: '#d9dce2', surface: '#ffffff', text: '#0f172a' },
 };
 
 export const INK_PALETTES: Record<ThemeMode, InkPalette> = {
@@ -49,7 +49,7 @@ export const INK_PALETTES: Record<ThemeMode, InkPalette> = {
         '500': '#78716c',
         '600': '#57534e',
         '700': '#44403c',
-        '800': '#292020',
+        '800': '#292524',
         '900': '#1c1917',
         '950': '#0c0a09',
     },
@@ -60,10 +60,15 @@ export const INK_PALETTES: Record<ThemeMode, InkPalette> = {
         '500': '#334155',
         '600': '#1e293b',
         '700': '#334155',
-        '800': '#e2e8f0',
+        '800': '#c7ced9',
         '900': '#0f172a',
         '950': '#e2e8f0',
     },
+};
+
+export const FELT_BORDER_PALETTES: Record<ThemeMode, string> = {
+    dark: '#403a35',
+    light: '#8d97a6',
 };
 
 const MODE_STORAGE_KEY = 'scrum_poker_theme_mode';
@@ -112,6 +117,7 @@ const applyTheme = (mode: ThemeMode, accent: AccentName) => {
     for (const shade of INK_SHADES) {
         root.style.setProperty(`--color-ink-${shade}`, ink[shade]);
     }
+    root.style.setProperty('--color-felt-border', FELT_BORDER_PALETTES[mode]);
     root.style.setProperty('color-scheme', mode);
     root.style.setProperty('--color-accent', accentVars.accent);
     root.style.setProperty('--color-accent-soft', accentVars.soft);
