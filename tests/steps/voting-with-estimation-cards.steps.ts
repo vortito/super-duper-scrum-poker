@@ -21,3 +21,7 @@ Then('the vote counter shows {string} for {string} and {string}', async ({ world
 Then('the board card of {string} faces the table center', async ({ world }, playerName: string) => {
     await new PokerTablePage(world.getPlayer('Alice')).expectBoardCardFacesCenter(playerName);
 });
+
+Then('the board card of {string} is hidden on the table', async ({ world }, playerName: string) => {
+    await new PokerTablePage(world.getPlayer(playerName)).expectBoardCardHidden(playerName);
+});

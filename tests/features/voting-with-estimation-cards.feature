@@ -19,3 +19,18 @@ Feature: Voting with Estimation Cards
     Given an active room with "Alice" and "Bob"
     Given "Alice" has voted with the card "5"
     Then the board card of "Alice" faces the table center
+
+  Scenario: Concurrent votes are both kept in the average
+    Given an active room with "Alice" and "Bob"
+    Given "Alice" has voted with the card "5"
+    Given "Bob" has voted with the card "8"
+    When "Alice" reveals the cards
+    Then the board shows "Alice" voting "5" and "Bob" voting "8"
+    Then the average displayed is "6.5"
+
+  Scenario: Changing my vote does not assign a vote to a player who has not voted
+    Given an active room with "Alice" and "Bob"
+    Given "Alice" has voted with the card "5"
+    When "Alice" changes their vote to the card "8"
+    Then the vote counter shows "1 / 2" for "Alice" and "Bob"
+    Then the board card of "Bob" is hidden on the table

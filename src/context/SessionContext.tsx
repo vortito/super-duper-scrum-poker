@@ -233,12 +233,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
             const snapshot = await transaction.get(sessionRef);
             const data = snapshot.data() as Session;
             transaction.update(sessionRef, {
-                players: data.players.map((p) => {
-                    if (p.id === currentUser.id) {
-                        return { ...p, vote };
-                    }
-                    return p.vote !== null ? p : { ...p, vote: currentUser.vote };
-                })
+                players: data.players.map((p) => (p.id === currentUser.id ? { ...p, vote } : p))
             });
         });
     };
@@ -263,6 +258,9 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
         await runTransaction(db, async (transaction) => {
             const snapshot = await transaction.get(sessionRef);
             const data = snapshot.data() as Session;
+            if (data.revealed) {
+                return;
+            }
             transaction.update(sessionRef, {
                 revealed: true,
                 average: computeAverage(data.players.map((p) => p.vote))

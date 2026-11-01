@@ -35,6 +35,11 @@ export class PokerTablePage {
         return this.page.getByTestId(`board-card-${playerName}`);
     }
 
+    /** The name of the player belonging to this page (read from the same localStorage key the app uses). */
+    private async ownName(): Promise<string> {
+        return this.page.evaluate(() => localStorage.getItem('scrum_poker_user_name') ?? '');
+    }
+
     private votingCard(value: string): Locator {
         const escaped = value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         return this.page.getByRole('button', { name: new RegExp(`^${escaped}(\\s+${escaped})*$`) });
@@ -64,6 +69,12 @@ export class PokerTablePage {
 
     async vote(value: string): Promise<void> {
         await this.votingCard(value).click();
+        // Wait until THIS player's board card surface is visible on the table (their vote is in the snapshot).
+        // The surface is the div that toggles opacity-0/opacity-100 and keeps its transition classes
+        // (unlike the revealed number face, which also has rounded-lg shadow-xl but no transition-all).
+        const name = await this.ownName();
+        const surface = this.boardCard(name).locator('div.transition-all.duration-300.rounded-lg.shadow-xl');
+        await expect(surface).toHaveClass(/opacity-100/, { timeout: 5000 });
     }
 
     async expectSelectedCard(value: string): Promise<void> {

@@ -38,7 +38,7 @@ export const THEME_ORDER: AccentName[] = ['blue', 'green', 'pink', 'orange', 'cy
 
 export const SURFACE_PALETTES: Record<ThemeMode, SurfacePalette> = {
     dark: { bg: '#0c0a09', surface: '#1c1917', text: '#f8fafc' },
-    light: { bg: '#d9dce2', surface: '#ffffff', text: '#0f172a' },
+    light: { bg: '#d8d9db', surface: '#ffffff', text: '#0f172a' },
 };
 
 export const INK_PALETTES: Record<ThemeMode, InkPalette> = {
@@ -60,7 +60,7 @@ export const INK_PALETTES: Record<ThemeMode, InkPalette> = {
         '500': '#334155',
         '600': '#1e293b',
         '700': '#334155',
-        '800': '#ccc7bf',
+        '800': '#cacbd0',
         '900': '#0f172a',
         '950': '#e2e8f0',
     },
@@ -68,7 +68,7 @@ export const INK_PALETTES: Record<ThemeMode, InkPalette> = {
 
 export const FELT_BORDER_PALETTES: Record<ThemeMode, string> = {
     dark: '#403a35',
-    light: '#8a847a',
+    light: '#87898c',
 };
 
 export const DANGER_PALETTES: Record<ThemeMode, string> = {
