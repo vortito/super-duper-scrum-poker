@@ -44,6 +44,10 @@ Then('{string} sees the {string} ink scale applied', async ({ world }, playerNam
     await new ThemeSelectorPage(world.getPlayer(playerName)).expectInkScale(MODES[modeName]);
 });
 
+Then('{string} sees the {string} danger color', async ({ world }, playerName: string, modeName: string) => {
+    await new ThemeSelectorPage(world.getPlayer(playerName)).expectDangerColor(MODES[modeName]);
+});
+
 When('{string} opens the settings menu', async ({ world }, playerName: string) => {
     await new SettingsMenuPage(world.getPlayer(playerName)).open();
 });

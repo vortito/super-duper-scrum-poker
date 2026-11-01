@@ -15,6 +15,10 @@ Then('the board shows {string} voting {string} and {string} voting {string}', as
     await table.expectBoardCard(name2, value2);
 });
 
+Then('the board shows {string} voting {string}', async ({ world }, name: string, value: string) => {
+    await new PokerTablePage(world.getPlayer(name)).expectBoardCard(name, value);
+});
+
 Then('the average displayed is {string}', async ({ world }, value: string) => {
     for (const name of Object.keys(world.players)) {
         await new PokerTablePage(world.getPlayer(name)).expectAverage(value);

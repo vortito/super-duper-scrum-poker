@@ -100,7 +100,7 @@ export const WelcomeScreen: React.FC = () => {
                     {error && (
                         <div
                             data-testid="error-message"
-                            className="p-3 bg-danger/10 border border-danger/20 rounded-lg text-danger text-sm flex items-center justify-center"
+                            className="p-3 bg-danger/15 border border-danger/30 rounded-lg text-danger text-sm flex items-center justify-center"
                         >
                             {error}
                         </div>

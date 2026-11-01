@@ -25,3 +25,20 @@ Feature: Shared Player Theme
     When "Bob" selects the theme "orange"
     Then Alice sees Bob avatar in the "orange" accent
     Then Bob sees Alice avatar in the "pink" accent
+
+  Scenario: Each player's card back is shown in the accent of its owner
+    Given "Alice" has selected the theme "pink"
+    Given "Bob" has selected the theme "orange"
+    Given "Alice" has voted with the card "5"
+    Given "Bob" has voted with the card "8"
+    Then the card of "Alice" is shown in the "pink" accent
+    Then the card of "Bob" is shown in the "orange" accent
+
+  Scenario: Each revealed card number is shown in the deep accent of its owner
+    Given "Alice" has selected the theme "pink"
+    Given "Bob" has selected the theme "orange"
+    Given "Alice" has voted with the card "5"
+    Given "Bob" has voted with the card "8"
+    When "Alice" reveals the cards
+    Then the revealed card of "Alice" shows "5" in the "pink" accent
+    Then the revealed card of "Bob" shows "8" in the "orange" accent

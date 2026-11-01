@@ -26,3 +26,9 @@ Feature: Card Reveal and Results
     When "Alice" starts a new round
     Then the vote counter shows "0 / 2" for "Alice" and "Bob"
     Then the cards of "Alice" and "Bob" are hidden on the table
+
+  Scenario: Reveal is available even when not everyone has voted
+    Given an active room with "Alice" and "Bob"
+    Given "Alice" has voted with the card "5"
+    When "Bob" reveals the cards
+    Then the board shows "Alice" voting "5"

@@ -1,5 +1,5 @@
 import { Page, Locator, expect } from '@playwright/test';
-import { ACCENTS, SURFACE_PALETTES, INK_PALETTES } from '../../src/context/ThemeContext';
+import { ACCENTS, SURFACE_PALETTES, INK_PALETTES, DANGER_PALETTES } from '../../src/context/ThemeContext';
 import type { AccentName, ThemeMode } from '../../src/context/ThemeContext';
 import { SettingsMenuPage } from './settings-menu.page';
 
@@ -61,6 +61,12 @@ export class ThemeSelectorPage {
         await expect
             .poll(() => this.page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim()))
             .toBe(ACCENTS[name].accent);
+    }
+
+    async expectDangerColor(mode: ThemeMode): Promise<void> {
+        await expect
+            .poll(() => this.page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--color-danger').trim()))
+            .toBe(DANGER_PALETTES[mode]);
     }
 
     async expectPaletteApplied(mode: ThemeMode, accent: AccentName): Promise<void> {
