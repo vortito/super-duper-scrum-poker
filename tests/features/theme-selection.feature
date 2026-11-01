@@ -49,6 +49,11 @@ Feature: Theme Selection
   Scenario: Dark mode applies the warm ink scale to the felt and cards
     Then "Alex" sees the "dark" ink scale applied
 
+  Scenario: The danger color is lightened in dark mode and darkened in light mode
+    Then "Alex" sees the "dark" danger color
+    When "Alex" switches to the "light" mode
+    Then "Alex" sees the "light" danger color
+
   Scenario: The settings menu opens and closes
     When "Alex" opens the settings menu
     Then "Alex" sees the settings menu open

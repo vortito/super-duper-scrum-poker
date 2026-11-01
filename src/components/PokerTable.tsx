@@ -61,8 +61,6 @@ export const PokerTable: React.FC = () => {
 
     if (!session) return null;
 
-    const allPlayersHaveVoted = session.players.length > 0 && session.players.every((p) => p.vote !== null);
-
     const copyLink = () => {
         navigator.clipboard.writeText(window.location.href);
     };
@@ -117,7 +115,7 @@ export const PokerTable: React.FC = () => {
 
                 <button
                     onClick={leaveSession}
-                    className="pointer-events-auto absolute top-20 right-6 flex items-center gap-2 px-4 py-2 rounded-full bg-danger/10 hover:bg-danger/20 text-danger hover:brightness-110 transition-all border border-danger/20 text-sm font-medium backdrop-blur-md"
+                    className="pointer-events-auto absolute top-20 right-6 flex items-center gap-2 px-4 py-2 rounded-full bg-danger/15 hover:bg-danger/20 text-danger hover:brightness-110 transition-all border border-danger/30 text-sm font-medium backdrop-blur-md"
                 >
                     <LogOut size={16} />
                     <span>{t('game.exit')}</span>
@@ -172,9 +170,7 @@ export const PokerTable: React.FC = () => {
                                 <button
                                     data-testid="reveal-button"
                                     onClick={() => revealVotes()}
-                                    disabled={!allPlayersHaveVoted}
-                                    title={allPlayersHaveVoted ? undefined : t('game.revealLocked')}
-                                    className="group relative px-8 py-4 bg-accent hover:brightness-110 rounded-full text-white font-bold shadow-lg shadow-accent/25 transition-all hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+                                    className="group relative px-8 py-4 bg-accent hover:brightness-110 rounded-full text-white font-bold shadow-lg shadow-accent/25 transition-all hover:scale-105 active:scale-95"
                                 >
                                     <span className="flex items-center gap-2">
                                         <Eye size={20} /> {t('game.reveal')}
@@ -189,7 +185,7 @@ export const PokerTable: React.FC = () => {
                     {sortedPlayers.map((player, index) => {
                         const { cardX, cardY, playerX, playerY, scale, rotationDeg } = getPositions(index, sortedPlayers.length);
                         const isMe = currentUser?.id === player.id;
-                        const playerAccentVars = !isMe && player.theme ? resolveAccentVars(player.theme.accent) : undefined;
+                        const playerAccentVars = player.theme ? resolveAccentVars(player.theme.accent) : undefined;
 
                         const avatarSize = Math.max(40, 60 * scale);
                         const cardWidth = Math.max(56, 56 * scale);
@@ -207,7 +203,12 @@ export const PokerTable: React.FC = () => {
                                         height: `${cardHeight}px`
                                     }}
                                 >
-                                    <div className="relative w-full h-full">
+                                    <div className="relative w-full h-full" style={playerAccentVars ? {
+                                        '--color-accent': playerAccentVars.accent,
+                                        '--color-accent-soft': playerAccentVars.soft,
+                                        '--color-accent-deep': playerAccentVars.deep,
+                                        '--color-accent-secondary': playerAccentVars.secondary
+                                    } as React.CSSProperties : undefined}>
                                         <div
                                             className={cn('w-full h-full rounded-lg shadow-xl transition-all duration-300', player.vote !== null ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0')}
                                         >
@@ -217,7 +218,7 @@ export const PokerTable: React.FC = () => {
                                                 </div>
                                             ) : (
                                                 <div
-                                                    className="absolute inset-0 bg-white text-ink-900 rounded-lg flex items-center justify-center font-bold border-2 border-ink-200 shadow-xl"
+                                                    className="absolute inset-0 bg-white text-accent-deep rounded-lg flex items-center justify-center font-bold border-2 border-ink-200 shadow-xl"
                                                     style={{ fontSize: `${Math.max(1.25, 1.25 * scale)}rem` }}
                                                 >
                                                     {player.vote === '?' ? '🃏' : player.vote}

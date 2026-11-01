@@ -60,7 +60,7 @@ export const INK_PALETTES: Record<ThemeMode, InkPalette> = {
         '500': '#334155',
         '600': '#1e293b',
         '700': '#334155',
-        '800': '#c7ced9',
+        '800': '#ccc7bf',
         '900': '#0f172a',
         '950': '#e2e8f0',
     },
@@ -68,7 +68,12 @@ export const INK_PALETTES: Record<ThemeMode, InkPalette> = {
 
 export const FELT_BORDER_PALETTES: Record<ThemeMode, string> = {
     dark: '#403a35',
-    light: '#8d97a6',
+    light: '#8a847a',
+};
+
+export const DANGER_PALETTES: Record<ThemeMode, string> = {
+    dark: '#fca5a5',
+    light: '#b91c1c',
 };
 
 const MODE_STORAGE_KEY = 'scrum_poker_theme_mode';
@@ -118,6 +123,7 @@ const applyTheme = (mode: ThemeMode, accent: AccentName) => {
         root.style.setProperty(`--color-ink-${shade}`, ink[shade]);
     }
     root.style.setProperty('--color-felt-border', FELT_BORDER_PALETTES[mode]);
+    root.style.setProperty('--color-danger', DANGER_PALETTES[mode]);
     root.style.setProperty('color-scheme', mode);
     root.style.setProperty('--color-accent', accentVars.accent);
     root.style.setProperty('--color-accent-soft', accentVars.soft);

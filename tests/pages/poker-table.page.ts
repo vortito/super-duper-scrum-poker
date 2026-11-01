@@ -121,6 +121,35 @@ export class PokerTablePage {
             .toBe(`${accentRgb(accentHex)}|rgb(255, 255, 255)`);
     }
 
+    /** The back of a player's board card is rendered with the owner's accent gradient. */
+    async expectCardBackInAccent(playerName: string, accent: AccentName): Promise<void> {
+        const card = this.boardCard(playerName);
+        await expect(card).toBeVisible({ timeout: 5000 });
+        await expect
+            .poll(() => this.page.evaluate((name) => {
+                const card = document.querySelector(`[data-testid="board-card-${name}"]`) as HTMLElement | null;
+                const back = card ? (card.querySelector('div.absolute') as HTMLElement | null) : null;
+                return back ? getComputedStyle(back).backgroundImage : '';
+            }, playerName))
+            .toContain(accentRgb(ACCENTS[accent].accent));
+    }
+
+    /** The revealed number of a player's board card is colored with the owner's accent-deep. */
+    async expectRevealedNumberInAccentDeep(playerName: string, accent: AccentName): Promise<void> {
+        const card = this.boardCard(playerName);
+        await expect(card).toBeVisible({ timeout: 5000 });
+        await expect
+            .poll(() => this.page.evaluate((name) => {
+                const card = document.querySelector(`[data-testid="board-card-${name}"]`) as HTMLElement | null;
+                const face = card ? (card.querySelector('div.absolute') as HTMLElement | null) : null;
+                if (!face) {
+                    return '';
+                }
+                return getComputedStyle(face).color;
+            }, playerName))
+            .toBe(accentRgb(ACCENTS[accent].deep));
+    }
+
     async copyLink(): Promise<void> {
         await this.copyLinkButton.click();
     }
