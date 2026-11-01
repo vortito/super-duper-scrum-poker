@@ -25,6 +25,7 @@ const es = {
         agreed: 'Todos de acuerdo en',
         votes: 'votos',
         reveal: 'Revelar Cartas',
+        revealLocked: 'Espera a que todos voten para revelar',
         newRound: 'Nueva Ronda',
         copy: 'Copiar enlace'
     },
@@ -64,6 +65,7 @@ export const translations: Record<Language, typeof es> = {
             agreed: 'Everyone agreed on',
             votes: 'votes',
             reveal: 'Reveal Cards',
+            revealLocked: 'Wait for everyone to vote before revealing',
             newRound: 'New Round',
             copy: 'Copy Link'
         },
@@ -100,6 +102,7 @@ export const translations: Record<Language, typeof es> = {
             agreed: 'Tout le monde est d\'accord sur',
             votes: 'votes',
             reveal: 'Révéler les Cartes',
+            revealLocked: 'Attendez que tous aient voté avant de révéler',
             newRound: 'Nouvelle Manche',
             copy: 'Copier le lien'
         },

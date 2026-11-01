@@ -112,9 +112,13 @@ export class PokerTablePage {
         await expect
             .poll(() => this.page.evaluate((name) => {
                 const el = document.querySelector(`[data-testid="avatar-${name}"]`) as HTMLElement | null;
-                return el ? getComputedStyle(el).color : '';
+                if (!el) {
+                    return '';
+                }
+                const styles = getComputedStyle(el);
+                return `${styles.backgroundColor}|${styles.color}`;
             }, playerName))
-            .toBe(accentRgb(accentHex));
+            .toBe(`${accentRgb(accentHex)}|rgb(255, 255, 255)`);
     }
 
     async copyLink(): Promise<void> {

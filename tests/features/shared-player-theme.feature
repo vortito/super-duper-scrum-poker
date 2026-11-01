@@ -19,3 +19,9 @@ Feature: Shared Player Theme
     Given "Alice" has selected the theme "cyan"
     When "Bob" reloads the page
     Then Bob sees Alice avatar in the "cyan" accent
+
+  Scenario: Players with different accents see each other's avatars in their own accent
+    When "Alice" selects the theme "pink"
+    When "Bob" selects the theme "orange"
+    Then Alice sees Bob avatar in the "orange" accent
+    Then Bob sees Alice avatar in the "pink" accent

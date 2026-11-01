@@ -110,7 +110,7 @@ export const WelcomeScreen: React.FC = () => {
                         type="submit"
                         data-testid="submit-button"
                         disabled={loading || !name}
-                        className="w-full bg-gradient-to-r from-accent to-accent-secondary hover:brightness-110 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-accent/25 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 border border-white/10 flex items-center justify-center gap-2 mt-2"
+                        className="w-full bg-gradient-to-r from-accent to-accent-deep hover:brightness-110 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-accent/25 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 border border-white/10 flex items-center justify-center gap-2 mt-2"
                     >
                         {loading ? (
                             <span className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
